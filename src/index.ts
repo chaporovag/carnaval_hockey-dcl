@@ -5,6 +5,7 @@ import {
     GltfContainer,
     InputAction,
     inputSystem,
+    MeshRenderer,
     PointerEventType,
     Transform
 } from '@dcl/sdk/ecs'
@@ -13,11 +14,16 @@ import * as CANNON from 'cannon/build/cannon'
 import {Puck} from './puck'
 import * as utils from '@dcl-sdk/utils'
 import {PhysFactory} from './physFactory'
+import {ScoreObject} from './score'
 
 export function main() {
+    const isDebugging = false
+
     // Remove default trigger from a player so that they don't interfere
     utils.triggers.removeTrigger(engine.PlayerEntity)
-    utils.triggers.enableDebugDraw(true)
+    utils.triggers.enableDebugDraw(isDebugging)
+
+    const ground_position_y = 2.3
 
     // Puck and setting
     const X_OFFSET = 0
@@ -33,8 +39,7 @@ export function main() {
         scale: Vector3.One(),
         parent: puckParent
     })
-
-    utils.triggers.addTrigger(puck.entity, utils.LAYER_1, utils.NO_LAYERS, [{ type: 'sphere', radius: 0.5 }]);
+    utils.triggers.addTrigger(puck.entity, utils.LAYER_1, utils.NO_LAYERS, [{type: 'sphere', radius: 0.5}]);
 
     // Setup our CANNON world
     const world = new CANNON.World()
@@ -51,11 +56,31 @@ export function main() {
 
     // Create a ground plane and apply physics material
     const groundShape = new CANNON.Plane()
-    const groundBody = new CANNON.Body({ mass: 0 })
+    const groundBody = new CANNON.Body({
+        mass: 0,
+        position: new CANNON.Vec3(
+            0,
+            ground_position_y,
+            0
+        ), // m
+    })
     groundBody.addShape(groundShape)
     groundBody.material = groundMaterial
     groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2) // Reorient ground plane to be in the y-axis
     world.addBody(groundBody)
+
+    // Debug ground shape
+    if (isDebugging) {
+        const myPlane = engine.addEntity()
+
+        Transform.create(myPlane, {
+            position: groundBody.position,
+            rotation: groundBody.quaternion,
+            scale: Vector3.scale(Vector3.One(), 10)
+        })
+
+        MeshRenderer.setPlane(myPlane)
+    }
 
     // Create puck physics
     let puckTransform = Transform.getMutable(puck.entity)
@@ -90,6 +115,7 @@ export function main() {
         restitution: 0.6
     })
     world.addContactMaterial(wallContactMaterial)
+/*
 
     const wallSize = Vector3.create(32, 10, 1)
     const wallDelta = wallSize.z / 2
@@ -103,7 +129,7 @@ export function main() {
     })
     wallNorth.material = wallMaterial
     world.addBody(wallNorth)
-    utils.addTestCube({position: wallNorth.position, scale: wallSize }, undefined, undefined, undefined, false, true)
+    utils.addTestCube({position: wallNorth.position, scale: wallSize }, undefined, undefined, { ...Color4.Gray(), a: 0.5}, false, true)
 
     const wallSouth = new CANNON.Body({
         mass: 0,
@@ -112,8 +138,7 @@ export function main() {
     })
     wallSouth.material = wallMaterial
     world.addBody(wallSouth)
-    utils.addTestCube({position: wallSouth.position, scale: wallSize }, undefined, undefined, undefined, false, true)
-
+    utils.addTestCube({position: wallSouth.position, scale: wallSize }, undefined, undefined, { ...Color4.Gray(), a: 0.5}, false, true)
 
     const wallEast = new CANNON.Body({
         mass: 0,
@@ -123,8 +148,7 @@ export function main() {
     wallEast.material = wallMaterial
     wallEast.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI / 2)
     world.addBody(wallEast)
-    utils.addTestCube({position: wallEast.position, scale: wallSize, rotation: wallEast.quaternion }, undefined, undefined, undefined, false, true)
-
+    utils.addTestCube({position: wallEast.position, scale: wallSize, rotation: wallEast.quaternion }, undefined, undefined, { ...Color4.Gray(), a: 0.5}, false, true)
 
     const wallWest = new CANNON.Body({
         mass: 0,
@@ -134,11 +158,12 @@ export function main() {
     wallWest.material = wallMaterial
     wallWest.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), -Math.PI / 2)
     world.addBody(wallWest)
-    utils.addTestCube({position: wallWest.position, scale: wallSize, rotation: wallWest.quaternion }, undefined, undefined, undefined, false, true)
+    utils.addTestCube({position: wallWest.position, scale: wallSize, rotation: wallWest.quaternion }, undefined, undefined, { ...Color4.Gray(), a: 0.5}, false, true)
     //#endregion
+*/
 
     // Config
-    const SHOOT_VELOCITY = 130
+    const SHOOT_VELOCITY = 150
     const FIXED_TIME_STEPS = 1.0 / 60.0 // seconds
     const MAX_TIME_STEPS = 3
     const RECALL_SPEED = 10
@@ -159,13 +184,13 @@ export function main() {
             const player = Transform.get(engine.CameraEntity)
             let playerForwardVector = Vector3.subtract(
                 transform.position,
-                Vector3.create(player.position.x, player.position.y - Y_OFFSET, player.position.z)
+                Vector3.create(player.position.x, ground_position_y + Y_OFFSET, player.position.z)
             )
             let increment = Vector3.scale(playerForwardVector, -dt * RECALL_SPEED)
             transform.position = Vector3.add(puckTransform.position, increment)
             let distance = Vector3.distanceSquared(transform.position, player.position) // Check distance squared as it's more optimized
             // Note: Distance is squared so a value of 4.5 is when the puck is ~2.1m away
-            if (distance <= 4.5) {
+            if (distance <= 9) {
                 engine.removeSystem(recallDiscSystem)
                 resetDisc()
             }
@@ -189,7 +214,7 @@ export function main() {
                 let shootDirection = Vector3.rotate(Vector3.Forward(), cameraTransform.rotation) //Vector3.Forward().rotate(Camera.instance.rotation) // Camera's forward vector
                 puckBody.position.set(
                     cameraTransform.position.x + shootDirection.x,
-                    0.2,
+                    ground_position_y + 0.2,
                     cameraTransform.position.z + shootDirection.z
                 )
 
@@ -220,26 +245,27 @@ export function main() {
     }
 
     // Create ThirdViewArea
-    const thirdViewAreaSize = Vector3.create(10, 3, 10)
-    const thirdViewArea = utils.addTestCube({position: getCubePosition(), scale: thirdViewAreaSize }, undefined, undefined, { ...Color4.Blue(), a: 0.5 }, false, true)
+    const thirdViewAreaSize = Vector3.create(40, 3, 18)
+    const thirdViewArea = utils.addTestCube({position: Vector3.create(32, 3, 32), scale: thirdViewAreaSize }, undefined, undefined,  { ...Color4.Blue(), a: isDebugging ? 0.5 : 0.0 }, false, true)
     CameraModeArea.create(thirdViewArea, {
         area: thirdViewAreaSize,
         mode: CameraType.CT_FIRST_PERSON,
     })
 
-    function getCubePosition () {
-        return Vector3.create(Math.random() * 24, 0, Math.random() * 24)
-    }
-
     // Create GoalTriggerZone
     const goalTriggerZone = engine.addEntity()
     Transform.create(goalTriggerZone, {
-        position: getCubePosition(),
+        position: Vector3.create(48, 4, 32)
     })
-    utils.triggers.addTrigger(goalTriggerZone, utils.NO_LAYERS, utils.ALL_LAYERS, [{ type: 'box', scale: Vector3.create(5,5,5) }],
+    utils.triggers.addTrigger(goalTriggerZone, utils.NO_LAYERS, utils.ALL_LAYERS, [{ type: 'box', scale: Vector3.create(3,4,5) }],
         () => {
-            let transform = Transform.getMutable(goalTriggerZone)
-            transform.position = getCubePosition()
+            if (puck.isFired) {
+                let transform = Transform.getMutable(goalTriggerZone)
+                ScoreObject.Create({
+                    type: [ScoreObject.SCORE_TYPE.TEN, ScoreObject.SCORE_TYPE.TWENTYFIVE, ScoreObject.SCORE_TYPE.FIFTY][Math.floor(Math.random() * 3)],
+                    pos:  {...transform.position, y: 7 }
+                })
+            }
         },
         undefined,
         Color3.Red()
@@ -248,31 +274,103 @@ export function main() {
     // Create base scene
     const base = engine.addEntity()
     GltfContainer.create(base, {
-        src: 'models/TestBase_1.glb'
+        src: 'models/Test_Game_V1.glb'
     })
-    Transform.create(base, { position: Vector3.create(16, 0, 16), scale: Vector3.scale(Vector3.One(), 0.7)})
+    Transform.create(base, { position: Vector3.create(32, 0, 32), scale: Vector3.scale(Vector3.One(), 0.7)})
 
-    const physFactory = new PhysFactory(world, groundMaterial)
+    const physFactory = new PhysFactory(world, wallMaterial, isDebugging)
     physFactory.create({
-        size: Vector3.create(6, 1, 10),
-        position: Vector3.create(16, 0, 20),
-        rotation: -10
+        size: Vector3.create(34.2, 4, 0.7),
+        position: Vector3.create(28.35, 2, 24.37),
     })
     physFactory.create({
-        size: Vector3.create(6, 1, 10),
-        position: Vector3.create(16, 1, 25),
-        rotation: -30
+        size: Vector3.create(2, 4, 0.7),
+        position: Vector3.create(46.45, 2, 24.5),
+        rotationY: -9,
     })
     physFactory.create({
-        size: Vector3.create(6, 1, 5),
-        position: Vector3.create(16, 6, 30),
-        rotation: -75
+        size: Vector3.create(2.5, 4, 0.7),
+        position: Vector3.create(48.48, 2, 25.2),
+        rotationY: -27.5,
     })
     physFactory.create({
-        size: Vector3.create(6, 1, 8),
-        position: Vector3.create(16, 12, 30.5),
-        rotation: -90
+        size: Vector3.create(2.4, 4, 0.7),
+        position: Vector3.create(50.3, 2, 26.5),
+        rotationY: -45,
     })
+    physFactory.create({
+        size: Vector3.create(2.5, 4, 0.7),
+        position: Vector3.create(51.65, 2, 28.3),
+        rotationY: -62.5,
+    })
+    physFactory.create({
+        size: Vector3.create(2.5, 4, 0.7),
+        position: Vector3.create(52.35, 2, 30.5),
+        rotationY: -81,
+    })
+
+
+    physFactory.create({
+        size: Vector3.create(34.2, 4, 0.7),
+        position: Vector3.create(28.35, 2, 39.9), //15.62
+    })
+    physFactory.create({
+        size: Vector3.create(2, 4, 0.7),
+        position: Vector3.create(46.45, 2, 39.8),
+        rotationY: 9,
+    })
+    physFactory.create({
+        size: Vector3.create(2.5, 4, 0.7),
+        position: Vector3.create(48.48, 2, 39),
+        rotationY: 27.5,
+    })
+    physFactory.create({
+        size: Vector3.create(2.4, 4, 0.7),
+        position: Vector3.create(50.3, 2, 37.8),
+        rotationY: 45,
+    })
+    physFactory.create({
+        size: Vector3.create(2.5, 4, 0.7),
+        position: Vector3.create(51.65, 2, 35.92),
+        rotationY: 62.5,
+    })
+    physFactory.create({
+        size: Vector3.create(3.2, 4, 0.7),
+        position: Vector3.create(52.35, 2, 33.3),
+        rotationY: 81,
+    })
+
+
+    physFactory.create({
+        size: Vector3.create(3.2, 4, 0.3),
+        position: Vector3.create(48.35, 4, 35),
+        rotationY: 14,
+    })
+    physFactory.create({
+        size: Vector3.create(3.2, 4, 0.3),
+        position: Vector3.create(48.35, 4, 29),
+        rotationY: -14,
+    })
+    physFactory.create({
+        size: Vector3.create(5.5, 4, 0.6),
+        position: Vector3.create(50, 4, 32),
+        rotationY: 90,
+    })
+
+    const player = engine.addEntity()
+    Transform.create(player, {
+        position: Vector3.create(44, 3.5, 32),
+        rotation: Quaternion.Zero(),
+        scale: Vector3.scale(Vector3.One(), 0.5),
+    })
+    GltfContainer.create(player, {
+        src: 'models/Player_Game_V1.glb'
+    })
+    physFactory.create({
+        size: Vector3.create(1, 4, 2.5),
+        position: Transform.getMutable(player).position,
+    })
+
 
     // don't show the puck outside the scene
     // engine.addSystem(onlyInSceneSystem)

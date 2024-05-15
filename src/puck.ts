@@ -1,4 +1,4 @@
-import {engine, Entity, MeshRenderer, Transform, TransformType} from '@dcl/sdk/ecs'
+import {engine, Entity, GltfContainer, Transform, TransformType} from '@dcl/sdk/ecs'
 
 export class Puck {
     entity: Entity = engine.addEntity()
@@ -7,14 +7,11 @@ export class Puck {
     orangeGlow: Entity = engine.addEntity()
 
     constructor(transform: TransformType) {
-        transform.scale = {
-            x: transform.scale.x,
-            y: 0.1,
-            z: transform.scale.z
-        };
         Transform.create(this.entity, transform)
-
-        MeshRenderer.setCylinder(this.entity, 0.2, 0.2)
+        GltfContainer.create(this.entity, {
+            src: 'models/Shaiba_V1.glb'
+        })
+        // MeshRenderer.setCylinder(this.entity, 0.2, 0.2)
 
         this.setFired(false)
     }
