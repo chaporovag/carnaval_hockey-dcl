@@ -2,8 +2,8 @@
   "ecs7": true,
   "runtimeVersion": "7",
   "display": {
-    "title": "Carnaval Hockey Showdown",
-    "description": "Test your skills in Carnaval Hockey Showdown! Score at least 5 goals in 5 minutes and prove you are the ultimate hockey champion.",
+    "title": "Carnaval Neon Hockey Attraction ",
+    "description": "Test your skills in Neon Hockey Attraction! Score at least 5 goals in 5 minutes and prove you are the ultimate hockey champion.",
     "navmapThumbnail": "images/scene-thumbnail.png",
     "favicon": "favicon_asset"
   },
