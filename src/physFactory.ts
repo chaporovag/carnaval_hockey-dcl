@@ -21,7 +21,7 @@ export class PhysFactory {
         this.isDebugging = isDebugging
     }
 
-    create({size, position, rotationX, rotationY, rotationZ}: Params): void {
+    create({size, position, rotationX, rotationY, rotationZ}: Params): CANNON.Body {
         const shape = new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2))
         const body = new CANNON.Body({
             mass: 0,
@@ -53,5 +53,7 @@ export class PhysFactory {
                 rotation: body.quaternion
             }, undefined, undefined, {...Color4.Green(), a: 0.75}, false, true)
         }
+
+        return body
     }
 }
