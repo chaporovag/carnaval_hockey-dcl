@@ -2,7 +2,7 @@
   "ecs7": true,
   "runtimeVersion": "7",
   "display": {
-    "title": "Neon Hockey Attraction ",
+    "title": "Neon Hockey Attraction Simulator ",
     "description": "Test your skills in Neon Hockey Attraction! Score at least 5 goals in 5 minutes and prove you are the ultimate hockey champion.",
     "navmapThumbnail": "images/scene-thumbnail.png",
     "favicon": "favicon_asset"
