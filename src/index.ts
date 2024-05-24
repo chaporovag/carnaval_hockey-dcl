@@ -36,12 +36,12 @@ export function main() {
     const world = physWorld.world
     const goaltender = new Goaltender(isDebugging)
     const leftDefender = new Defender({
-        left: Vector3.create(40, 2.28, 35),
-        right:  Vector3.create(40, 2.28, 28)
+        left: Vector3.create(40, 2.28, 37),
+        right:  Vector3.create(40, 2.28, 26)
     }, 2, isDebugging)
     const rightDefender = new Defender({
-        left: Vector3.create(32, 2.28, 35),
-        right:  Vector3.create(32, 2.28, 28)
+        left: Vector3.create(32, 2.28, 37),
+        right:  Vector3.create(32, 2.28, 26)
     }, 1.6, isDebugging)
 
     function start() {
