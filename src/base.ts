@@ -1,8 +1,9 @@
 import {engine, Entity, GltfContainer, Transform} from '@dcl/sdk/ecs'
-import {Vector3} from '@dcl/sdk/math'
+import {Color4, Vector3} from '@dcl/sdk/math'
 import {PhysFactory} from './physFactory'
 import {Materials, physWorld} from './physWorld'
 import CANNON from 'cannon/build/cannon'
+import * as utils from '@dcl-sdk/utils'
 
 export class Base {
     private readonly entity: Entity = engine.addEntity()
@@ -100,5 +101,11 @@ export class Base {
             position: Vector3.create(50, 4, 32),
             rotationY: 90,
         })
+
+        const position = Transform.get(this.entity).position
+        utils.addTestCube({
+            position: Vector3.create(position.x + 3, position.y + 10, position.z),
+            scale: Vector3.create(30, 20, 20),
+        }, undefined, undefined, {...Color4.Red(), a: debug ? 0.75 : 0})
     }
 }

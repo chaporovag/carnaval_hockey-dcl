@@ -10,9 +10,9 @@ export enum Materials {
 
 class PhysWorld {
     public readonly world: CANNON.World
-    private readonly isDebugging: boolean = true
     public readonly groundPositionY = 2.3
 
+    private debug: boolean = false
     public readonly materials: Record<string, CANNON.Material> = {}
 
     constructor() {
@@ -44,7 +44,7 @@ class PhysWorld {
         world.addBody(groundBody)
 
         // Debug ground shape
-        if (this.isDebugging) {
+        if (this.debug) {
             const myPlane = engine.addEntity()
 
             Transform.create(myPlane, {
@@ -67,6 +67,10 @@ class PhysWorld {
 
     public getMaterial(name: Materials): CANNON.Material {
         return this.materials[name];
+    }
+
+    public setDebugDraw(value: boolean): void {
+        this.debug = value
     }
 }
 
