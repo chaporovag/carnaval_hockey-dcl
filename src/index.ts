@@ -1,4 +1,4 @@
-import {CameraModeArea, CameraType, engine, InputAction, inputSystem, PointerEventType, Transform,} from '@dcl/sdk/ecs'
+import {CameraModeArea, CameraType, engine, InputAction, inputSystem, PointerEventType, Transform} from '@dcl/sdk/ecs'
 import {Color3, Quaternion, Vector3} from '@dcl/sdk/math'
 import * as CANNON from 'cannon/build/cannon'
 import {Puck} from './puck'
@@ -8,15 +8,26 @@ import {physWorld} from './physWorld'
 import {Sign} from './sign'
 import {Base} from './base'
 import {Defender} from './defender'
+import {Sound} from './sound'
+import {hideUi, setupUi} from './ui'
 
 
 const isDebugging = false
 export function main() {
-    utils.triggers.enableDebugDraw(isDebugging)
+    const startSound = new Sound('sounds/start_timer.mp3')
+    const hornSound = new Sound('sounds/horn.mp3')
+    const goalSound = new Sound('sounds/horn_goal.mp3')
+    const whistleSound = new Sound('sounds/whistle.mp3')
+    const gameSound = new Sound('sounds/game_session.mp3', true)
 
-    const sign = new Sign('')
+    utils.triggers.enableDebugDraw(isDebugging)
+    physWorld.setDebugDraw(isDebugging)
+
     let score = 0
     let time = 0
+    let startTimeout: number
+
+    const sign = new Sign('')
     function updateGame(score: number, time: number) {
         let finishedText = ''
         if (time <= 0) finishedText = 'YOU LOSE';
@@ -45,14 +56,19 @@ export function main() {
     }, 1.6, isDebugging)
 
     function start() {
+        hornSound.play()
         score = 0;
         time = 60;
-        sign.startTimer(() => updateGame(score,--time))
+        sign.startTimer(() => updateGame(score, --time))
         goaltender.start()
         puck.start()
     }
 
     function end(text: string = '') {
+        utils.timers.clearTimeout(startTimeout)
+        startSound.stop()
+        gameSound.stop()
+        whistleSound.play()
         sign.stopTimer()
         puck.stop()
         goaltender.stop();
@@ -61,6 +77,8 @@ export function main() {
         score = 0;
         time = 0;
         sign.setText(text)
+        resetDisc()
+        hideUi()
     }
 
     // Puck and setting
@@ -115,6 +133,8 @@ export function main() {
             // console.log('SHOOT_STRENGTH', SHOOT_STRENGTH)
             if (!puck.isFired) {
                 // engine.addSystem(shootDiscSystem)
+                utils.playSound('sounds/slap_shot.mp3')
+
                 puck.setFired(true)
                 Transform.getMutable(puck.entity).parent = engine.RootEntity
 
@@ -164,7 +184,13 @@ export function main() {
         utils.NO_LAYERS,
         utils.LAYER_1,
         [{ type: 'box', scale: thirdViewAreaSize }],
-        () => start(),
+        () => {
+            // Play sound
+            startSound.play()
+            gameSound.play()
+            setupUi()
+            startTimeout = utils.timers.setTimeout(() => start(), 9500)
+        },
         () => end(),
         Color3.Black()
     )
@@ -182,6 +208,7 @@ export function main() {
     utils.triggers.addTrigger(goalTriggerZone, utils.NO_LAYERS, utils.ALL_LAYERS, [{ type: 'box', scale: Vector3.create(3,4,5) }],
         () => {
             if (puck.isFired && time > 0) {
+                goalSound.play()
                 updateGame(++score, time)
             }
         },
@@ -197,7 +224,7 @@ export function main() {
         rightDefender.update()
         puck.update()
     })
-   /* function shootDiscSystem(dt: number) {
+    /*function shootDiscSystem(dt: number) {
         if (puck.isFired) {
             // world.step(FIXED_TIME_STEPS, dt, MAX_TIME_STEPS)
             let transform = Transform.getMutable(puck.entity)
@@ -212,5 +239,5 @@ export function main() {
     // engine.addSystem(onlyInSceneSystem)
 
     // UI
-    // setupUi()
+
 }
