@@ -21,7 +21,6 @@ import { timers } from './timers'
 export class Game {
   // Game
   private readonly GOAL_TARGET = 15
-  private readonly GAME_DURATION = 60
   private readonly SHOOT_VELOCITY = 150
   private readonly RECALL_SPEED = 10
 
@@ -124,7 +123,6 @@ export class Game {
         this.scene?.playTutorialAnimation()
         this.startSound?.play()
         this.gameSound?.play()
-        // this.startTimeout = utils.timers.setTimeout(() => this.start(), 9500)
         timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true })
         // this.start()
       },
@@ -259,15 +257,15 @@ export class Game {
 
   private update(score: number, time: number) {
     let finishedText = ''
-    if (time <= 0) finishedText = 'FAIL'
-    if (score >= this.GOAL_TARGET) finishedText = 'YOU WON'
+    if (time <= 0) finishedText = 'TRY AGAIN'
+    if (score >= this.GOAL_TARGET) finishedText = 'WINNER'
 
     if (finishedText) {
       this.end(finishedText)
       return
     }
 
-    this.sign?.setText(`${time} | ${score} / ${this.GOAL_TARGET}`)
+    this.sign?.setScoreTime(time, score, this.GOAL_TARGET)
 
     if (time < 45) {
       this.farTender?.start()
@@ -279,17 +277,15 @@ export class Game {
 
   private start() {
     this.score = 0
-    this.time = this.GAME_DURATION
+    this.time = 60
     this.hornSound?.play()
     timers.create('updateTimer', () => this.update(this.score, --this.time), { delay: 1000 })
-    // this.sign?.startTimer(() => this.update(this.score, --this.time))
     this.goalkeeper?.start()
     this.puck?.start()
     this.isGameStarted = true
   }
 
   private end(text: string = '') {
-    // utils.timers.clearTimeout(this.startTimeout)
     timers.remove('startTimer')
     timers.remove('updateTimer')
 
@@ -299,7 +295,6 @@ export class Game {
     this.startSound?.stop()
     this.gameSound?.stop()
 
-    // this.sign?.stopTimer()
     this.puck?.stop()
     this.goalkeeper?.stop()
     this.farTender?.stop()
