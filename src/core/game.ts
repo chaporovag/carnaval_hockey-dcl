@@ -18,6 +18,9 @@ import { Sound } from './sound'
 import { setupUi } from '../ui'
 
 export class Game {
+  // Game
+  private readonly GOAL_TARGET = 10
+
   // Config
   private readonly X_OFFSET = 0
   private readonly Y_OFFSET = 0.05
@@ -235,14 +238,14 @@ export class Game {
   private update(score: number, time: number) {
     let finishedText = ''
     if (time <= 0) finishedText = 'FAIL'
-    if (score >= 30) finishedText = 'YOU WON'
+    if (score >= this.GOAL_TARGET) finishedText = 'YOU WON'
 
     if (finishedText) {
       this.end(finishedText)
       return
     }
 
-    this.sign?.setText(`${time} | ${score} / 30`)
+    this.sign?.setText(`${time} | ${score} / ${this.GOAL_TARGET}`)
 
     if (time < 45) {
       this.farTender?.start()
