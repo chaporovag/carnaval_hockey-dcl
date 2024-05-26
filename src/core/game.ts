@@ -16,26 +16,26 @@ import resources from './resources'
 import { Goalkeeper, Goaltender, Puck, Scene, Scoreboard } from '../entites'
 import { Sound } from './sound'
 import { setupUi } from '../ui'
+import { timers } from './timers'
 
 export class Game {
   // Game
-  private readonly GOAL_TARGET = 10
+  private readonly GOAL_TARGET = 15
+  private readonly GAME_DURATION = 60
+  private readonly SHOOT_VELOCITY = 150
+  private readonly RECALL_SPEED = 10
 
   // Config
   private readonly X_OFFSET = 0
   private readonly Y_OFFSET = 0.05
   private readonly Z_OFFSET = 2.5
 
-  // Physics
-  private readonly SHOOT_VELOCITY = 150
-  private readonly RECALL_SPEED = 10
-
   // Variables
   private readonly isDebug
   private score = 0
   private time = 0
-  private startTimeout = -1
   private isRecalling = false
+  private isGameStarted = false
 
   // Entities
   private scene: Scene | undefined
@@ -121,9 +121,11 @@ export class Game {
       utils.LAYER_1,
       [{ type: 'box', scale: thirdViewAreaSize }],
       () => {
+        this.scene?.playTutorialAnimation()
         this.startSound?.play()
         this.gameSound?.play()
-        this.startTimeout = utils.timers.setTimeout(() => this.start(), 9500)
+        // this.startTimeout = utils.timers.setTimeout(() => this.start(), 9500)
+        timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true })
         // this.start()
       },
       () => this.end(),
@@ -134,6 +136,26 @@ export class Game {
       area: thirdViewAreaSize,
       mode: CameraType.CT_FIRST_PERSON
     })
+  }
+
+  private updateStartTimer(): void {
+    const timer = timers.get('startTimer')
+    switch (timer?.count) {
+      case 1:
+        this.sign?.setText('Score at least', 10)
+        break
+      case 2:
+        this.sign?.setText(`${this.GOAL_TARGET} goals`)
+        break
+      case 3:
+        this.sign?.setText('in 1 minute')
+        break
+      case 4:
+        this.sign?.setText('GOOOO!!!')
+        timers.remove('startTimer')
+        this.start()
+        break
+    }
   }
 
   private createGoalTriggerZone(): void {
@@ -256,20 +278,28 @@ export class Game {
   }
 
   private start() {
-    this.hornSound?.play()
     this.score = 0
-    this.time = 60
-    this.sign?.startTimer(() => this.update(this.score, --this.time))
+    this.time = this.GAME_DURATION
+    this.hornSound?.play()
+    timers.create('updateTimer', () => this.update(this.score, --this.time), { delay: 1000 })
+    // this.sign?.startTimer(() => this.update(this.score, --this.time))
     this.goalkeeper?.start()
     this.puck?.start()
+    this.isGameStarted = true
   }
 
   private end(text: string = '') {
-    utils.timers.clearTimeout(this.startTimeout)
+    // utils.timers.clearTimeout(this.startTimeout)
+    timers.remove('startTimer')
+    timers.remove('updateTimer')
+
+    if (this.isGameStarted) {
+      this.whistleSound?.play()
+    }
     this.startSound?.stop()
     this.gameSound?.stop()
-    this.whistleSound?.play()
-    this.sign?.stopTimer()
+
+    // this.sign?.stopTimer()
     this.puck?.stop()
     this.goalkeeper?.stop()
     this.farTender?.stop()
@@ -277,6 +307,7 @@ export class Game {
     this.sign?.setText(text)
     this.score = 0
     this.time = 0
+    this.isGameStarted = false
     this.resetDisc()
   }
 

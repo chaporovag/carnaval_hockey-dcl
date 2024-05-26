@@ -10,6 +10,7 @@ export class Scene {
   private readonly SCENE_POSITION = Vector3.create(32, 0, 32)
   private readonly entity: Entity = engine.addEntity()
   private readonly goalAnimation: Entity = engine.addEntity()
+  private readonly tutorialAnimation: Entity = engine.addEntity()
 
   constructor(debug: boolean = false) {
     const world = physWorld.getWorld()
@@ -35,6 +36,32 @@ export class Scene {
       states: [
         {
           clip: 'GoalON',
+          playing: false,
+          loop: false
+        }
+      ]
+    })
+
+    this.tutorialAnimation = engine.addEntity()
+    GltfContainer.create(this.tutorialAnimation, { src: resources.MODEL_TUTORIAL_FX })
+    Transform.create(this.tutorialAnimation, {
+      position: this.SCENE_POSITION
+    })
+
+    Animator.create(this.tutorialAnimation, {
+      states: [
+        {
+          clip: 'on',
+          playing: false,
+          loop: false
+        },
+        {
+          clip: 'state',
+          playing: false,
+          loop: false
+        },
+        {
+          clip: 'off',
           playing: false,
           loop: false
         }
@@ -161,5 +188,9 @@ export class Scene {
 
   public playGoalAnimation(): void {
     Animator.playSingleAnimation(this.goalAnimation, 'GoalON')
+  }
+
+  public playTutorialAnimation(): void {
+    Animator.playSingleAnimation(this.tutorialAnimation, 'on')
   }
 }
