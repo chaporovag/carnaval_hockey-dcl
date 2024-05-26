@@ -256,16 +256,11 @@ export class Game {
   }
 
   private update(score: number, time: number) {
-    let finishedText = ''
-    if (time <= 0) finishedText = 'TRY AGAIN'
-    if (score >= this.GOAL_TARGET) finishedText = 'WINNER'
-
-    if (finishedText) {
+    if (time <= 0) {
+      const finishedText = score >= this.GOAL_TARGET ? 'WINNER!' : 'TRY AGAIN'
       this.end(finishedText)
       return
     }
-
-    this.sign?.setScoreTime(time, score, this.GOAL_TARGET)
 
     if (time < 45) {
       this.farTender?.start()
@@ -273,6 +268,8 @@ export class Game {
     if (time < 30) {
       this.nearTender?.start()
     }
+
+    this.sign?.setScoreTime(time, score, this.GOAL_TARGET)
   }
 
   private start() {

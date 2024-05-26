@@ -67,10 +67,10 @@ export class Scoreboard {
   public setScoreTime(time: number, score: number, maxScore: number): void {
     this.clear()
     TextShape.getMutable(this.scoreTitleEntity).text = 'goals'
-    TextShape.getMutable(this.scoreEntity).text = `${score} / ${maxScore}`
+    TextShape.getMutable(this.scoreEntity).text = `${score}/${maxScore}`
 
     TextShape.getMutable(this.timeTitleEntity).text = 'time'
-    TextShape.getMutable(this.timeEntity).text = `0:${time > 10 ? time : `0${time}`}`
+    TextShape.getMutable(this.timeEntity).text = `0:${time > 9 ? time : `0${time}`}`
   }
 
   public clear(): void {
