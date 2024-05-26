@@ -13,10 +13,10 @@
     "email": ""
   },
 
-    "worldConfiguration": {
+  "worldConfiguration": {
     "name": "0xmaki.dcl.eth"
-   },
-   
+  },
+
   "main": "bin/index.js",
   "tags": [],
   "scene": {
@@ -41,25 +41,14 @@
     "base": "0,0"
   },
 
-
-  
   "spawnPoints": [
     {
       "name": "spawn1",
       "default": true,
       "position": {
-        "x": [
-          0,
-          3
-        ],
-        "y": [
-          0,
-          0
-        ],
-        "z": [
-          0,
-          3
-        ]
+        "x": [0, 3],
+        "y": [0, 0],
+        "z": [0, 3]
       },
       "cameraTarget": {
         "x": 8,

@@ -1,5 +1,4 @@
-import {engine, Schemas} from '@dcl/sdk/ecs'
-
+import { engine, Schemas } from '@dcl/sdk/ecs'
 
 // We use this component to track and group all spinning entities.
 // engine.getEntitiesWith(Spinner)
