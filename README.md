@@ -13,13 +13,11 @@
 ## 🎵 About the game
 
 Welcome to Neon Hockey Arcade, a vibrant and futuristic ice hockey simulator designed for the Game Jam. Step into a neon-lit world where you can experience the thrill of arcade-style hockey in a visually stunning setting. Test your skills, adapt to increasing challenges, and prove you are the ultimate hockey champion!
-
-****
 Immerse yourself in a dazzling neon-themed arcade ice hockey game.
 The action takes place in a futuristic stadium, adorned with neon lights and hockey decor.
 Reflecting the "Neon Fairground" Theme
 The game features radiant neon colors, creating an otherworldly fairground ambiance.
-Neon lighting and visual effects enhance the futuristic and extraordinary gameplay experience.****
+Neon lighting and visual effects enhance the futuristic and extraordinary gameplay experience.
 
 ## 🔎 Overview
 Neon Hockey Arcade is a dazzling neon arcade hockey game set in a futuristic stadium filled with vibrant neon lights and hockey decor. Reflecting the "Neon Fairground" theme, the game features vibrant colours and stunning visual effects, creating an otherworldly atmosphere.
