@@ -12,15 +12,9 @@
 
 ## 🎵 About the game
 
-Imagine how you bathe in the melodies of Decentraland.
-
-Our scene is a Musical tower built from musical notes and scores.
-
-Climbing onto the roof on the music platforms activates a new musical part with overcoming each floor.
-
-After going through all the floors and climbing onto the top, the player enjoys playing the full music mix.
-
-Depending on which route the player chooses, the final mix may sound different.
+Welcome to Neon Hockey Arcade, a colourful and futuristic ice hockey simulator developed for Decentraland. 
+Immerse yourself in a neon world where you can experience the excitement of arcade hockey in a visually impressive environment. 
+Test your skills, adapt to growing challenges and prove that you are a true champion!
 
 <p align="center">
     <img src="screenshots/poap.gif" width="300"><br>
