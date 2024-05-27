@@ -10,7 +10,7 @@
     <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/inceptionfun?style=social" />  
 </p>
 
-## 🎵 About the game
+## 🏒 About the game 🥅
 
 Welcome to Neon Hockey Arcade, a vibrant and futuristic ice hockey simulator designed for the Game Jam. Step into a neon-lit world where you can experience the thrill of arcade-style hockey in a visually stunning setting. Test your skills, adapt to increasing challenges, and prove you are the ultimate hockey champion!
 Immerse yourself in a dazzling neon-themed arcade ice hockey game.
@@ -64,7 +64,9 @@ npm start
 
 
 ## 🙏 Backlog
-**Many thanks to DCL-Edit developers team!**
+** Lorem ipsum Lorem ipsum**
+
+Lorem ipsum Lorem ipsum
 
 
 
