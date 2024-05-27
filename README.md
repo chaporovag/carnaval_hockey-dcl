@@ -22,7 +22,7 @@ Neon lighting and visual effects enhance the futuristic and extraordinary gamepl
 ## 🔎 Overview
 Neon Hockey Arcade is a dazzling neon arcade hockey game set in a futuristic stadium filled with vibrant neon lights and hockey decor. Reflecting the "Neon Fairground" theme, the game features vibrant colours and stunning visual effects, creating an otherworldly atmosphere.
 
-You have to control the puck by clicking the mouse to hit it and aim for the goal. The gameplay is easy to understand but challenging to master, providing a smooth learning curve. You start with a goalie defending the goal, which requires basic skills. As you progress, defenders appear one at a time to assist the goalkeeper, increasing the challenge and requiring higher skill levels. Your goal is to score at least 15 goals in 1 minute to prove your skills and become the ultimate hockey champion.
+You have to control the puck by clicking the mouse to hit it and aim for the goal. The gameplay is easy to understand but challenging to master, providing a smooth learning curve. You start with a goalie defending the goal, which requires basic skills. As you progress, defenders appear one at a time to assist the goalkeeper, increasing the challenge and requiring higher skill levels. Your goal is to score at least 15 goals in 1 minute to prove your skills and become the ultimate hockey champion 🏆.
 
 The game is optimized to run smoothly at 30 FPS, ensuring a seamless and enjoyable experience. Both graphics and mechanics are fine-tuned to prevent lags and delays. Combining arcade ice hockey with a neon visual style, Neon Hockey Arcade offers a unique and engaging experience. Utilizing the capabilities of Decentraland, the game creates an immersive and visually stunning environment.
 
