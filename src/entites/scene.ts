@@ -41,11 +41,6 @@ export class Scene {
           clip: 'on',
           playing: true,
           loop: true
-        },
-        {
-          clip: 'off',
-          playing: false,
-          loop: false
         }
       ]
     })
@@ -208,13 +203,12 @@ export class Scene {
   }
 
   public playIceMachineAnimation(): void {
+    Transform.getMutable(this.iceMachine).scale = Vector3.One()
     Animator.playSingleAnimation(this.iceMachine, 'on')
   }
 
   public stopIceMachineAnimation(): void {
     Animator.stopAllAnimations(this.iceMachine)
-    Animator.playSingleAnimation(this.iceMachine, 'off')
-
-    // utils.tweens.startScaling(this.iceMachine, Vector3.One(), Vector3.Zero(), 3, utils.InterpolationType.EASEINQUAD)
+    Transform.getMutable(this.iceMachine).scale = Vector3.Zero()
   }
 }
