@@ -1,4 +1,6 @@
 import {
+  AvatarModifierArea,
+  AvatarModifierType,
   CameraModeArea,
   CameraType,
   engine,
@@ -6,6 +8,7 @@ import {
   GltfContainer,
   InputAction,
   inputSystem,
+  PlayerIdentityData,
   PointerEventType,
   Transform
 } from '@dcl/sdk/ecs'
@@ -136,6 +139,18 @@ export class Game {
     CameraModeArea.create(thirdViewArea, {
       area: thirdViewAreaSize,
       mode: CameraType.CT_FIRST_PERSON
+    })
+
+    const excludeIds = []
+    for (const [entity, data, transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
+      console.log('Player data: ', { entity, data, transform })
+      excludeIds.push(data.address)
+    }
+
+    AvatarModifierArea.create(thirdViewArea, {
+      area: Vector3.create(4, 3, 4),
+      modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
+      excludeIds
     })
   }
 
