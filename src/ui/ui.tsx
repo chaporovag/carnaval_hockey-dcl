@@ -1,11 +1,9 @@
-import { openExternalUrl } from '~system/RestrictedActions'
-import ReactEcs, { Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
-import resources from './core/resources'
-
-const GITHUB_LINK = 'https://github.com/chaporovag/carnaval_hockey-dcl'
+import { openExternalUrl } from '~system/RestrictedActions';
+import ReactEcs, { Label, ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs';
+import resources from '../core/resources';
 
 export function setupUi() {
-  ReactEcsRenderer.setUiRenderer(GitHubLinkUi)
+  ReactEcsRenderer.setUiRenderer(GitHubLinkUi);
 }
 
 function GitHubLinkUi() {
@@ -31,10 +29,10 @@ function GitHubLinkUi() {
           }
         }}
         onMouseDown={() => {
-          openExternalUrl({ url: GITHUB_LINK })
+          openExternalUrl({ url: resources.LINK_GITHUB });
         }}
       />
       <Label value="View project" fontSize={18} textAlign="middle-center" />
     </UiEntity>
-  )
+  );
 }

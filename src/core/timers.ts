@@ -1,4 +1,4 @@
-import * as utils from '@dcl-sdk/utils'
+import * as utils from '@dcl-sdk/utils';
 
 class Timer {
   constructor(
@@ -9,44 +9,44 @@ class Timer {
 }
 
 class Timers {
-  private timers: Record<string, Timer> = {}
+  private timers: Record<string, Timer> = {};
 
   public create(
     name: string,
     callback: () => void,
     { delay, maxCount, immediately }: { delay: number; maxCount?: number; immediately?: boolean }
   ): void {
-    this.remove(name)
+    this.remove(name);
 
     const timerId = utils.timers.setInterval(() => {
-      const timer = this.timers[name]
+      const timer = this.timers[name];
       if (timer && maxCount && timer.count >= maxCount) {
-        this.remove(name)
+        this.remove(name);
       } else {
-        timer && timer.count++
-        callback()
+        timer && timer.count++;
+        callback();
       }
-    }, delay)
+    }, delay);
 
-    this.timers[name] = new Timer(timerId, delay)
+    this.timers[name] = new Timer(timerId, delay);
 
     if (immediately) {
-      this.timers[name].count++
-      callback()
+      this.timers[name].count++;
+      callback();
     }
   }
 
   public remove(name: string): void {
-    const timer = this.timers[name]
+    const timer = this.timers[name];
     if (timer) {
-      utils.timers.clearInterval(timer.id)
-      delete this.timers[name]
+      utils.timers.clearInterval(timer.id);
+      delete this.timers[name];
     }
   }
 
   public get(name: string): Timer {
-    return this.timers[name]
+    return this.timers[name];
   }
 }
 
-export const timers = new Timers()
+export const timers = new Timers();

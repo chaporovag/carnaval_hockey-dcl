@@ -1,6 +1,5 @@
 export default {
   MODEL_SCENE: 'models/scene.glb',
-  MODEL_ICE_MACHINE: 'models/iceMachine.glb',
   MODEL_GOAL_FX: 'models/goalFx.glb',
   MODEL_TUTORIAL_FX: 'models/tutorialFx.glb',
   MODEL_PUCK: 'models/puck.glb',
@@ -14,5 +13,7 @@ export default {
   SOUND_START: 'sounds/start_timer.mp3',
   SOUND_WHISTLE: 'sounds/whistle.mp3',
 
-  IMAGE_GITHUB: 'images/github.png'
-}
+  IMAGE_GITHUB: 'images/github.png',
+
+  LINK_GITHUB: 'https://github.com/chaporovag/carnaval_hockey-dcl'
+};
