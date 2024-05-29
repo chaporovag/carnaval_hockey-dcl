@@ -15,7 +15,8 @@ export class Scene {
   constructor(debug: boolean = false) {
     const world = physWorld.getWorld()
     const puckMaterial = physWorld.getMaterial(Materials.PUCK)
-    const wallMaterial = physWorld.createMaterial(Materials.WALL)
+    const wallMaterial = physWorld.getMaterial(Materials.WALL)
+    // const wallMaterial = physWorld.createMaterial(Materials.WALL)
     const wallContactMaterial = new CANNON.ContactMaterial(wallMaterial, puckMaterial, {
       friction: 0.0,
       restitution: 0.6

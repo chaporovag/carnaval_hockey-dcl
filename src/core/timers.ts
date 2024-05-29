@@ -1,10 +1,15 @@
 import * as utils from '@dcl-sdk/utils'
 
+interface InputData {
+  delay: number
+  maxCount?: number
+  immediately?: boolean
+}
+
 interface IData {
   id: number
   delay: number
-  count?: number
-  immediately?: boolean
+  count: number
 }
 
 class Timers {
@@ -14,15 +19,19 @@ class Timers {
     this.list = {}
   }
 
-  public create(name: string, callback: () => void, data: Omit<IData, 'id'>): void {
+  public create(name: string, callback: () => void, data: InputData): void {
     if (this.list[name]) {
       this.remove(name)
     }
 
     const id = utils.timers.setInterval(() => {
-      const t = this.get(name)
-      if (t && t.count !== undefined) {
-        t.count += 1
+      if (data.maxCount) {
+        const t = this.get(name)
+        if (t && t.count !== undefined && t.count >= data.maxCount) {
+          this.remove(name)
+        } else {
+          t && t.count++
+        }
       }
       callback()
     }, data.delay)
@@ -35,9 +44,7 @@ class Timers {
 
     if (data.immediately) {
       const t = this.get(name)
-      if (t && t.count !== undefined) {
-        t.count += 1
-      }
+      t && t.count++
       callback()
     }
   }

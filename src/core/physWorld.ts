@@ -24,6 +24,9 @@ class PhysWorld {
     world.quatNormalizeFast = false
     world.gravity.set(0, -9.82, 0) // m/s²
 
+    const puckMaterial = this.createMaterial(Materials.PUCK)
+    const wallMaterial = this.createMaterial(Materials.WALL)
+
     const groundMaterial = this.createMaterial(Materials.GROUND)
     const groundContactMaterial = new CANNON.ContactMaterial(groundMaterial, groundMaterial, {
       friction: 0.0,

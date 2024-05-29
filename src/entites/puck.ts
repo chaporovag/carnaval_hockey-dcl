@@ -10,6 +10,7 @@ export class Puck {
   private readonly _body: CANNON.Body
   private _isFired: boolean = false
   private _isStarted: boolean = false
+  private _isActive: boolean = false
 
   constructor(transform: TransformType) {
     Transform.create(this._entity, transform)
@@ -25,7 +26,8 @@ export class Puck {
     })
 
     const groundMaterial = physWorld.getMaterial(Materials.GROUND)
-    const puckMaterial = physWorld.createMaterial(Materials.PUCK)
+    const puckMaterial = physWorld.getMaterial(Materials.PUCK)
+    // const puckMaterial = physWorld.createMaterial(Materials.PUCK)
     const puckContactMaterial = new CANNON.ContactMaterial(groundMaterial, puckMaterial, {
       friction: 0.0,
       restitution: 0.0
@@ -53,16 +55,24 @@ export class Puck {
 
   public stop(): void {
     const mutable = Transform.getMutable(this._entity)
-    mutable.scale = Vector3.Zero()
+    // mutable.scale = Vector3.Zero()
     this._isStarted = false
     this._isFired = false
   }
 
+  /*  public activate(): void {
+    this._isActive = true
+  }
+
+  public deactivate(): void {
+    this._isActive = false
+  }*/
+
   public update(): void {
-    if (this._isFired) {
-      let transform = Transform.getMutable(this._entity)
-      transform.position = this._body.position
-    }
+    // if (this._isFired) {
+    let transform = Transform.getMutable(this._entity)
+    transform.position = this._body.position
+    // }
   }
 
   public get entity(): Entity {
@@ -73,11 +83,11 @@ export class Puck {
     return this._body
   }
 
-  public get isFired(): boolean {
+  /*public get isFired(): boolean {
     return this._isFired
-  }
+  }*/
 
-  public get isStarted(): boolean {
+  /*public get isStarted(): boolean {
     return this._isStarted
-  }
+  }*/
 }

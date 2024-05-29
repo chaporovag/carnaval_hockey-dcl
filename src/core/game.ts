@@ -3,6 +3,7 @@ import {
   CameraType,
   engine,
   Entity,
+  GltfContainer,
   InputAction,
   inputSystem,
   PointerEventType,
@@ -10,13 +11,14 @@ import {
 } from '@dcl/sdk/ecs'
 import * as utils from '@dcl-sdk/utils'
 import CANNON from 'cannon/build/cannon'
-import { Color3, Quaternion, Vector3 } from '@dcl/sdk/math'
+import { Color3, Vector3 } from '@dcl/sdk/math'
 import { physWorld } from './physWorld'
 import resources from './resources'
-import { Goalkeeper, Goaltender, Puck, Scene, Scoreboard } from '../entites'
+import { Goalkeeper, Goaltender, Scene, Scoreboard } from '../entites'
 import { Sound } from './sound'
 import { setupUi } from '../ui'
 import { timers } from './timers'
+import { pool } from '../entites/pool'
 
 export class Game {
   // Game
@@ -39,7 +41,7 @@ export class Game {
   // Entities
   private scene: Scene | undefined
   private sign: Scoreboard | undefined
-  private puck: Puck | undefined
+  // private puck: Puck | undefined
   private puckParent: Entity | undefined
   private goalkeeper: Goalkeeper | undefined
   private farTender: Goaltender | undefined
@@ -90,13 +92,13 @@ export class Game {
     )
 
     this.puckParent = engine.addEntity()
-    Transform.create(this.puckParent, { parent: engine.PlayerEntity, position: Vector3.create(0, 0, 0) })
-
-    this.puck = new Puck({
-      position: Vector3.create(this.X_OFFSET, this.Y_OFFSET, this.Z_OFFSET),
-      rotation: Quaternion.Zero(),
-      scale: Vector3.Zero(),
-      parent: this.puckParent
+    Transform.create(this.puckParent, {
+      parent: engine.PlayerEntity,
+      position: Vector3.create(0, 0.05, 2.5),
+      scale: Vector3.Zero()
+    })
+    GltfContainer.create(this.puckParent, {
+      src: resources.MODEL_PUCK
     })
 
     this.scene = new Scene(this.isDebug)
@@ -123,7 +125,7 @@ export class Game {
         this.scene?.playTutorialAnimation()
         this.startSound?.play()
         this.gameSound?.play()
-        timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true })
+        timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 })
         // this.start()
       },
       () => this.end(),
@@ -137,6 +139,9 @@ export class Game {
   }
 
   private updateStartTimer(): void {
+    /*if (!this.isGameStarted) this.start()
+    return*/
+
     const timer = timers.get('startTimer')
     switch (timer?.count) {
       case 1:
@@ -165,7 +170,7 @@ export class Game {
       utils.ALL_LAYERS,
       [{ type: 'box', scale: Vector3.create(3, 4, 5) }],
       () => {
-        if (this.puck?.isFired && this.time > 0) {
+        if (/*this.puck?.isFired && */ this.time > 0) {
           this.goalSound?.play()
           this.scene?.playGoalAnimation()
           this.update(++this.score, this.time)
@@ -186,44 +191,65 @@ export class Game {
 
   private setupSystems(): void {
     engine.addSystem(() => this.gameSystem(), 1, 'gameSystem')
-    engine.addSystem((dt) => this.recallSystem(dt), 2, 'recallSystem')
+    // engine.addSystem((dt) => this.recallSystem(dt), 2, 'recallSystem')
     engine.addSystem((dt) => this.updateSystem(dt), 3, 'updateSystem')
   }
 
   private gameSystem(): void {
     const pointerDown = inputSystem.getInputCommand(InputAction.IA_POINTER, PointerEventType.PET_DOWN)
 
-    if (pointerDown && this.puck) {
-      const { isStarted, isFired, body, entity } = this.puck
-      if (!isStarted) return
+    if (pointerDown && this.isGameStarted && !this.isRecalling) {
+      const puck = pool.get()
+      const { /*isStarted, isFired,*/ body, entity } = puck
+      // if (!isStarted) return
 
-      if (!isFired) {
-        utils.playSound(resources.SOUND_SLAP)
+      // if (!isFired) {
+      utils.playSound(resources.SOUND_SLAP)
 
-        this.puck.setFired(true)
-        Transform.getMutable(entity).parent = engine.RootEntity
+      puck.setFired(true)
+      // Transform.getMutable(entity).parent = engine.RootEntity
 
-        const cameraTransform = Transform.get(engine.CameraEntity)
-        const shootDirection = Vector3.rotate(Vector3.Forward(), cameraTransform.rotation)
-        body.position.set(
-          cameraTransform.position.x + shootDirection.x,
-          physWorld.getWorldPosition().y + 0.2,
-          cameraTransform.position.z + shootDirection.z
+      const cameraTransform = Transform.get(engine.CameraEntity)
+      const shootDirection = Vector3.rotate(Vector3.Forward(), cameraTransform.rotation)
+      body.position.set(
+        cameraTransform.position.x + shootDirection.x,
+        physWorld.getWorldPosition().y + 0.4,
+        cameraTransform.position.z + shootDirection.z
+      )
+
+      // Shoot
+      body.applyImpulse(
+        new CANNON.Vec3(shootDirection.x * this.SHOOT_VELOCITY, 0, shootDirection.z * this.SHOOT_VELOCITY),
+        body.position
+      )
+
+      if (this.puckParent) {
+        // Reset puck
+        this.isRecalling = true
+        Transform.getMutable(this.puckParent).scale = Vector3.Zero()
+        timers.create(
+          'recallTimer',
+          () => {
+            Transform.getMutable(this.puckParent as Entity).scale = Vector3.One()
+            this.isRecalling = false
+          },
+          { delay: 500, maxCount: 1 }
         )
-
-        // Shoot
-        body.applyImpulse(
-          new CANNON.Vec3(shootDirection.x * this.SHOOT_VELOCITY, 0, shootDirection.z * this.SHOOT_VELOCITY),
-          body.position
-        )
-      } else {
+        /*
+        utils.timers.setTimeout(() => {
+          Transform.getMutable(this.puckParent as Entity).scale = Vector3.One()
+          this.isRecalling = false
+        }, 500)*/
+      }
+      /*} else {
         // Recall
         this.isRecalling = true
-        this.puck.setFired(false)
-      }
+        puck.setFired(false)
+        puck.deactivate()
+      }*/
     }
   }
-
+  /*
   private recallSystem(dt: number): void {
     if (this.isRecalling && this.puck) {
       const { isFired, body, entity } = this.puck
@@ -245,14 +271,15 @@ export class Game {
         this.resetDisc()
       }
     }
-  }
+  }*/
 
   private updateSystem(dt: number): void {
     physWorld.update(dt)
     this.goalkeeper?.update()
     this.farTender?.update()
     this.nearTender?.update()
-    this.puck?.update()
+    // this.puck?.update()
+    pool.update()
   }
 
   private update(score: number, time: number) {
@@ -278,13 +305,15 @@ export class Game {
     this.hornSound?.play()
     timers.create('updateTimer', () => this.update(this.score, --this.time), { delay: 1000 })
     this.goalkeeper?.start()
-    this.puck?.start()
+    // this.puck?.start()
+    this.puckParent && (Transform.getMutable(this.puckParent).scale = Vector3.One())
     this.isGameStarted = true
   }
 
   private end(text: string = '') {
     timers.remove('startTimer')
     timers.remove('updateTimer')
+    timers.remove('recallTimer')
 
     if (this.isGameStarted) {
       this.whistleSound?.play()
@@ -292,7 +321,6 @@ export class Game {
     this.startSound?.stop()
     this.gameSound?.stop()
 
-    this.puck?.stop()
     this.goalkeeper?.stop()
     this.farTender?.stop()
     this.nearTender?.stop()
@@ -304,13 +332,15 @@ export class Game {
   }
 
   private resetDisc(): void {
-    if (this.puck) {
+    /*if (this.puck) {
       const { body, entity } = this.puck
       body.velocity.setZero()
       body.angularVelocity.setZero()
       let transform = Transform.getMutable(entity)
       transform.parent = this.puckParent
       transform.position = Vector3.create(this.X_OFFSET, this.Y_OFFSET, this.Z_OFFSET)
-    }
+    }*/
+    this.puckParent && (Transform.getMutable(this.puckParent).scale = Vector3.Zero())
+    this.isRecalling = false
   }
 }
