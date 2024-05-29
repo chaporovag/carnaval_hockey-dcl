@@ -8,7 +8,9 @@ import resources from '../core/resources'
 
 export class Scene {
   private readonly SCENE_POSITION = Vector3.create(32, 0, 32)
+
   private readonly entity: Entity = engine.addEntity()
+  private readonly iceMachine: Entity = engine.addEntity()
   private readonly goalAnimation: Entity = engine.addEntity()
   private readonly tutorialAnimation: Entity = engine.addEntity()
 
@@ -25,6 +27,11 @@ export class Scene {
 
     GltfContainer.create(this.entity, { src: resources.MODEL_SCENE })
     Transform.create(this.entity, {
+      position: this.SCENE_POSITION
+    })
+
+    GltfContainer.create(this.iceMachine, { src: resources.MODEL_ICE_MACHINE })
+    Transform.create(this.iceMachine, {
       position: this.SCENE_POSITION
     })
 

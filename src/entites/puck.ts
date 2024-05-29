@@ -83,9 +83,9 @@ export class Puck {
     return this._body
   }
 
-  /*public get isFired(): boolean {
+  public get isFired(): boolean {
     return this._isFired
-  }*/
+  }
 
   /*public get isStarted(): boolean {
     return this._isStarted

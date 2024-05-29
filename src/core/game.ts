@@ -14,7 +14,7 @@ import CANNON from 'cannon/build/cannon'
 import { Color3, Vector3 } from '@dcl/sdk/math'
 import { physWorld } from './physWorld'
 import resources from './resources'
-import { Goalkeeper, Goaltender, Scene, Scoreboard } from '../entites'
+import { Goalkeeper, Goaltender, Puck, Scene, Scoreboard } from '../entites'
 import { Sound } from './sound'
 import { setupUi } from '../ui'
 import { timers } from './timers'
@@ -24,7 +24,7 @@ export class Game {
   // Game
   private readonly GOAL_TARGET = 15
   private readonly SHOOT_VELOCITY = 150
-  private readonly RECALL_SPEED = 10
+  private readonly RECALL_SPEED = 500
 
   // Config
   private readonly X_OFFSET = 0
@@ -169,8 +169,10 @@ export class Game {
       utils.NO_LAYERS,
       utils.ALL_LAYERS,
       [{ type: 'box', scale: Vector3.create(3, 4, 5) }],
-      () => {
-        if (/*this.puck?.isFired && */ this.time > 0) {
+      (entity: Entity) => {
+        const puck = pool.getBy(entity) as Puck
+        if (puck.isFired && this.time > 0) {
+          puck.setFired(false)
           this.goalSound?.play()
           this.scene?.playGoalAnimation()
           this.update(++this.score, this.time)
@@ -219,7 +221,11 @@ export class Game {
 
       // Shoot
       body.applyImpulse(
-        new CANNON.Vec3(shootDirection.x * this.SHOOT_VELOCITY, 0, shootDirection.z * this.SHOOT_VELOCITY),
+        new CANNON.Vec3(
+          shootDirection.x * this.SHOOT_VELOCITY,
+          shootDirection.x * Math.random() * 10,
+          shootDirection.z * this.SHOOT_VELOCITY
+        ),
         body.position
       )
 
@@ -230,11 +236,15 @@ export class Game {
         timers.create(
           'recallTimer',
           () => {
-            Transform.getMutable(this.puckParent as Entity).scale = Vector3.One()
+            this.puckParent && (Transform.getMutable(this.puckParent).scale = Vector3.One())
             this.isRecalling = false
           },
-          { delay: 500, maxCount: 1 }
+          { delay: this.RECALL_SPEED, maxCount: 1 }
         )
+
+        // const pos = Transform.getMutable(engine.PlayerEntity).position
+        // Transform.getMutable(engine.PlayerEntity).scale = Vector3.One()
+
         /*
         utils.timers.setTimeout(() => {
           Transform.getMutable(this.puckParent as Entity).scale = Vector3.One()
@@ -274,12 +284,14 @@ export class Game {
   }*/
 
   private updateSystem(dt: number): void {
-    physWorld.update(dt)
-    this.goalkeeper?.update()
-    this.farTender?.update()
-    this.nearTender?.update()
-    // this.puck?.update()
-    pool.update()
+    if (this.isGameStarted) {
+      physWorld.update(dt)
+      this.goalkeeper?.update()
+      this.farTender?.update()
+      this.nearTender?.update()
+      // this.puck?.update()
+      pool.update()
+    }
   }
 
   private update(score: number, time: number) {
@@ -328,6 +340,8 @@ export class Game {
     this.score = 0
     this.time = 0
     this.isGameStarted = false
+    pool.clear()
+
     this.resetDisc()
   }
 

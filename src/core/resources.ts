@@ -1,5 +1,6 @@
 export default {
   MODEL_SCENE: 'models/scene.glb',
+  MODEL_ICE_MACHINE: 'models/iceMachine.glb',
   MODEL_GOAL_FX: 'models/goalFx.glb',
   MODEL_TUTORIAL_FX: 'models/tutorialFx.glb',
   MODEL_PUCK: 'models/puck.glb',
