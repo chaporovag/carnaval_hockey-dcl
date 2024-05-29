@@ -5,7 +5,6 @@ import { Materials, physWorld } from '../core/physWorld'
 import CANNON from 'cannon/build/cannon'
 import * as utils from '@dcl-sdk/utils'
 import resources from '../core/resources'
-import { timers } from '../core/timers'
 
 export class Scene {
   private readonly SCENE_POSITION = Vector3.create(32, 0, 32)
@@ -31,7 +30,7 @@ export class Scene {
       position: this.SCENE_POSITION
     })
 
-    GltfContainer.create(this.iceMachine, { src: resources.MODEL_ICE_MACHINE })
+    /*GltfContainer.create(this.iceMachine, { src: resources.MODEL_ICE_MACHINE })
     Transform.create(this.iceMachine, {
       position: this.SCENE_POSITION
     })
@@ -44,7 +43,7 @@ export class Scene {
           loop: true
         }
       ]
-    })
+    })*/
 
     GltfContainer.create(this.goalAnimation, { src: resources.MODEL_GOAL_FX })
     Transform.create(this.goalAnimation, {
@@ -204,19 +203,19 @@ export class Scene {
   }
 
   public playIceMachineAnimation(): void {
-    timers.create(
+    /*timers.create(
       'iceMachine',
       () => {
         Transform.getMutable(this.iceMachine).scale = Vector3.One()
         Animator.playSingleAnimation(this.iceMachine, 'on')
       },
       { delay: 3000 }
-    )
+    )*/
   }
 
   public stopIceMachineAnimation(): void {
-    timers.remove('iceMachine')
+    /*timers.remove('iceMachine')
     Animator.stopAllAnimations(this.iceMachine)
-    Transform.getMutable(this.iceMachine).scale = Vector3.Zero()
+    Transform.getMutable(this.iceMachine).scale = Vector3.Zero()*/
   }
 }
