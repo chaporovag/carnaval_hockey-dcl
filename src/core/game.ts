@@ -131,26 +131,27 @@ export class Game {
         this.gameSound?.play()
         timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 })
         // this.start()
+
+        const excludeIds = []
+        for (const [entity, data, transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
+          console.log('Player data: ', { entity, data, transform })
+          excludeIds.push(data.address)
+        }
+        AvatarModifierArea.getMutable(thirdViewArea).excludeIds = excludeIds
       },
       () => this.end(),
       Color3.Yellow()
     )
 
+    AvatarModifierArea.create(thirdViewArea, {
+      area: thirdViewAreaSize,
+      modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
+      excludeIds: []
+    })
+
     CameraModeArea.create(thirdViewArea, {
       area: thirdViewAreaSize,
       mode: CameraType.CT_FIRST_PERSON
-    })
-
-    const excludeIds = []
-    for (const [entity, data, transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
-      console.log('Player data: ', { entity, data, transform })
-      excludeIds.push(data.address)
-    }
-
-    AvatarModifierArea.create(thirdViewArea, {
-      area: Vector3.create(4, 3, 4),
-      modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
-      excludeIds
     })
   }
 
