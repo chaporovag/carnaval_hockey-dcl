@@ -35,6 +35,21 @@ export class Scene {
       position: this.SCENE_POSITION
     })
 
+    Animator.create(this.iceMachine, {
+      states: [
+        {
+          clip: 'on',
+          playing: true,
+          loop: true
+        },
+        {
+          clip: 'off',
+          playing: false,
+          loop: false
+        }
+      ]
+    })
+
     GltfContainer.create(this.goalAnimation, { src: resources.MODEL_GOAL_FX })
     Transform.create(this.goalAnimation, {
       position: this.SCENE_POSITION
@@ -60,16 +75,6 @@ export class Scene {
       states: [
         {
           clip: 'on',
-          playing: false,
-          loop: false
-        },
-        {
-          clip: 'state',
-          playing: false,
-          loop: false
-        },
-        {
-          clip: 'off',
           playing: false,
           loop: false
         }
@@ -200,5 +205,16 @@ export class Scene {
 
   public playTutorialAnimation(): void {
     Animator.playSingleAnimation(this.tutorialAnimation, 'on')
+  }
+
+  public playIceMachineAnimation(): void {
+    Animator.playSingleAnimation(this.iceMachine, 'on')
+  }
+
+  public stopIceMachineAnimation(): void {
+    Animator.stopAllAnimations(this.iceMachine)
+    Animator.playSingleAnimation(this.iceMachine, 'off')
+
+    // utils.tweens.startScaling(this.iceMachine, Vector3.One(), Vector3.Zero(), 3, utils.InterpolationType.EASEINQUAD)
   }
 }

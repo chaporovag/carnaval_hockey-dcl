@@ -22,7 +22,7 @@ import { pool } from '../entites/pool'
 
 export class Game {
   // Game
-  private readonly GOAL_TARGET = 15
+  private readonly GOAL_TARGET = 30
   private readonly SHOOT_VELOCITY = 150
   private readonly RECALL_SPEED = 500
 
@@ -123,6 +123,7 @@ export class Game {
       [{ type: 'box', scale: thirdViewAreaSize }],
       () => {
         this.scene?.playTutorialAnimation()
+        this.scene?.stopIceMachineAnimation()
         this.startSound?.play()
         this.gameSound?.play()
         timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 })
@@ -343,6 +344,7 @@ export class Game {
     pool.clear()
 
     this.resetDisc()
+    this.scene?.playIceMachineAnimation()
   }
 
   private resetDisc(): void {
