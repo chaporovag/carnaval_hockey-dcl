@@ -1,64 +1,51 @@
 import * as utils from '@dcl-sdk/utils'
 
-interface InputData {
-  delay: number
-  maxCount?: number
-  immediately?: boolean
-}
-
-interface IData {
-  id: number
-  delay: number
-  count: number
+class Timer {
+  constructor(
+    public id: number,
+    public delay: number,
+    public count: number = 0
+  ) {}
 }
 
 class Timers {
-  private readonly list: Record<string, IData | null>
+  private timers: Record<string, Timer> = {}
 
-  constructor() {
-    this.list = {}
-  }
+  public create(
+    name: string,
+    callback: () => void,
+    { delay, maxCount, immediately }: { delay: number; maxCount?: number; immediately?: boolean }
+  ): void {
+    this.remove(name)
 
-  public create(name: string, callback: () => void, data: InputData): void {
-    if (this.list[name]) {
-      this.remove(name)
-    }
-
-    const id = utils.timers.setInterval(() => {
-      if (data.maxCount) {
-        const t = this.get(name)
-        if (t && t.count !== undefined && t.count >= data.maxCount) {
-          this.remove(name)
-        } else {
-          t && t.count++
-        }
+    const timerId = utils.timers.setInterval(() => {
+      const timer = this.timers[name]
+      if (timer && maxCount && timer.count >= maxCount) {
+        this.remove(name)
+      } else {
+        timer && timer.count++
+        callback()
       }
-      callback()
-    }, data.delay)
+    }, delay)
 
-    this.list[name] = {
-      id,
-      count: 0,
-      delay: data.delay
-    }
+    this.timers[name] = new Timer(timerId, delay)
 
-    if (data.immediately) {
-      const t = this.get(name)
-      t && t.count++
+    if (immediately) {
+      this.timers[name].count++
       callback()
     }
   }
 
   public remove(name: string): void {
-    const timer = this.list[name]
+    const timer = this.timers[name]
     if (timer) {
       utils.timers.clearInterval(timer.id)
-      this.list[name] = null
+      delete this.timers[name]
     }
   }
 
-  public get(name: string): IData | null {
-    return this.list[name]
+  public get(name: string): Timer {
+    return this.timers[name]
   }
 }
 

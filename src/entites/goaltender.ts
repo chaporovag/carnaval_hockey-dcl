@@ -14,7 +14,7 @@ interface IPosition {
 export class Goaltender {
   private readonly entity: Entity = engine.addEntity()
   private readonly player: Entity = engine.addEntity()
-  private readonly debugEntity: Entity | null = null
+  private readonly debugEntity!: Entity
   private readonly body: CANNON.Body
 
   private isReadyToPlay = false
@@ -119,14 +119,6 @@ export class Goaltender {
     const basePosition = this.position.left
     const { x, y, z } = basePosition
     Transform.getMutable(this.entity).position = basePosition
-    /*utils.tweens.startTranslation(
-            this.entity,
-            Transform.get(this.entity).position,
-            basePosition,
-            0,
-            InterpolationType.LINEAR,
-            () => Transform.getMutable(this.entity).position = basePosition
-        )*/
     const mutable = Transform.getMutable(this.player)
     mutable.scale = Vector3.Zero()
     mutable.rotation = Quaternion.fromAngleAxis(90, Vector3.create(0, 0, 1))

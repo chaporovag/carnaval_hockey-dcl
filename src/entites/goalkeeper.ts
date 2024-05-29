@@ -135,18 +135,10 @@ export class Goalkeeper {
     const basePosition = this.position.base
     const { x, y, z } = basePosition
     Transform.getMutable(this.entity).position = basePosition
-    /*
-        utils.tweens.startTranslation(
-            this.entity,
-            Transform.get(this.entity).position,
-            basePosition,
-            0,
-            InterpolationType.LINEAR,
-            () => Transform.getMutable(this.entity).position = basePosition
-        )*/
 
-    const mutable = Transform.getMutable(this.player)
-    ;(mutable.scale = Vector3.Zero()), (mutable.rotation = Quaternion.fromAngleAxis(90, Vector3.create(0, 0, 1)))
+    const transform = Transform.getMutable(this.player)
+    transform.scale = Vector3.Zero()
+    transform.rotation = Quaternion.fromAngleAxis(90, Vector3.create(0, 0, 1))
 
     this.body.position.set(x, y, z)
     if (this.debugEntity) {

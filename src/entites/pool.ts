@@ -1,36 +1,36 @@
 import { Puck } from './puck'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { Entity, Transform } from '@dcl/sdk/ecs'
+import { Entity, Transform, TransformType } from '@dcl/sdk/ecs'
 import * as utils from '@dcl-sdk/utils'
 
-class Pool {
-  private readonly MAX_POOL: number = 15
-  private pool: Puck[] = []
-  private allObjects: Puck[] = []
-  private activeObjects: Puck[] = []
+export class Pool {
+  private readonly POOL_SIZE: number = 10
+  private readonly TRANSFORM: TransformType = {
+    position: Vector3.create(0, 0.05, 2.5),
+    rotation: Quaternion.Zero(),
+    scale: Vector3.One()
+  }
+
+  private readonly _poolList: Puck[] = []
+  private readonly _allList: Puck[] = []
+  private _activeList: Puck[] = []
 
   public get(): Puck {
     let puck: Puck
 
-    if (this.pool.length > 0) {
-      puck = this.pool.pop() as Puck
+    if (this._poolList.length > 0) {
+      puck = this._poolList.pop() as Puck
       const { body, entity } = puck
       body.velocity.setZero()
       body.angularVelocity.setZero()
       let transform = Transform.getMutable(entity)
-      transform.position = Vector3.create(0, 0.05, 2.5)
-      transform.scale = Vector3.One()
-      // transform.scale = Vector3.scale(Vector3.One(), 3)
-    } else if (this.activeObjects.length < this.MAX_POOL) {
-      puck = new Puck({
-        position: Vector3.create(0, 0.05, 2.5),
-        rotation: Quaternion.Zero(),
-        scale: Vector3.One()
-        // scale: Vector3.scale(Vector3.One(), 3)
-      })
-      this.allObjects.push(puck)
+      transform.position = this.TRANSFORM.position
+      transform.scale = this.TRANSFORM.scale
+    } else if (this._activeList.length < this.POOL_SIZE) {
+      puck = new Puck(this.TRANSFORM)
+      this._allList.push(puck)
     } else {
-      throw new Error('Maximum number of game objects reached')
+      throw new Error('Maximum number of packs reached')
     }
 
     this.activate(puck)
@@ -39,22 +39,22 @@ class Pool {
   }
 
   private activate(puck: Puck) {
-    this.activeObjects.push(puck)
+    this._activeList.push(puck)
     utils.timers.setTimeout(() => this.deactivate(puck), 5000)
   }
 
   private deactivate(puck: Puck) {
-    this.activeObjects = this.activeObjects.filter((activeObject) => activeObject !== puck)
+    this._activeList = this._activeList.filter((activeObject) => activeObject !== puck)
     puck.setFired(false)
-    this.pool.push(puck)
+    this._poolList.push(puck)
   }
 
   public update(): void {
-    this.activeObjects.forEach((activeObject) => activeObject.update())
+    this._activeList.forEach((activeObject) => activeObject.update())
   }
 
   public clear(): void {
-    this.allObjects.forEach((puck) => {
+    this._allList.forEach((puck) => {
       let transform = Transform.getMutable(puck.entity)
       transform.scale = Vector3.Zero()
       puck.setFired(false)
@@ -62,8 +62,6 @@ class Pool {
   }
 
   public getBy(entity: Entity): Puck | undefined {
-    return this.allObjects.find((puck) => puck.entity === entity)
+    return this._allList.find((puck) => puck.entity === entity)
   }
 }
-
-export const pool = new Pool()

@@ -17,22 +17,16 @@ import CANNON from 'cannon/build/cannon'
 import { Color3, Vector3 } from '@dcl/sdk/math'
 import { physWorld } from './physWorld'
 import resources from './resources'
-import { Goalkeeper, Goaltender, Puck, Scene, Scoreboard } from '../entites'
+import { Goalkeeper, Goaltender, Pool, Puck, Scene, Scoreboard } from '../entites'
 import { Sound } from './sound'
 import { setupUi } from '../ui'
 import { timers } from './timers'
-import { pool } from '../entites/pool'
 
 export class Game {
-  // Game
+  // Config
   private readonly GOAL_TARGET = 30
   private readonly SHOOT_VELOCITY = 150
   private readonly RECALL_SPEED = 500
-
-  // Config
-  private readonly X_OFFSET = 0
-  private readonly Y_OFFSET = 0.05
-  private readonly Z_OFFSET = 2.5
 
   // Variables
   private readonly isDebug
@@ -42,20 +36,21 @@ export class Game {
   private isGameStarted = false
 
   // Entities
-  private scene: Scene | undefined
-  private sign: Scoreboard | undefined
-  // private puck: Puck | undefined
-  private puckParent: Entity | undefined
-  private goalkeeper: Goalkeeper | undefined
-  private farTender: Goaltender | undefined
-  private nearTender: Goaltender | undefined
+  private scene!: Scene
+  private sign!: Scoreboard
+  private pool!: Pool
+  private puckParent!: Entity
+  private goalkeeper!: Goalkeeper
+  private farTender!: Goaltender
+  private nearTender!: Goaltender
 
   // Sounds
-  private startSound: Sound | undefined
-  private hornSound: Sound | undefined
-  private goalSound: Sound | undefined
-  private whistleSound: Sound | undefined
-  private gameSound: Sound | undefined
+  private startSound!: Sound
+  private hornSound!: Sound
+  private slapSound!: Sound
+  private goalSound!: Sound
+  private whistleSound!: Sound
+  private gameSound!: Sound
 
   constructor(debug: boolean = false) {
     this.isDebug = debug
@@ -73,7 +68,7 @@ export class Game {
 
   private setupGameObjects(): void {
     this.sign = new Scoreboard()
-
+    this.pool = new Pool()
     this.goalkeeper = new Goalkeeper(this.isDebug)
 
     this.farTender = new Goaltender(
@@ -125,10 +120,10 @@ export class Game {
       utils.LAYER_1,
       [{ type: 'box', scale: thirdViewAreaSize }],
       () => {
-        this.scene?.playTutorialAnimation()
-        this.scene?.stopIceMachineAnimation()
-        this.startSound?.play()
-        this.gameSound?.play()
+        this.scene.playTutorialAnimation()
+        this.scene.stopIceMachineAnimation()
+        this.startSound.play()
+        this.gameSound.play()
         timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 })
         // this.start()
 
@@ -156,22 +151,19 @@ export class Game {
   }
 
   private updateStartTimer(): void {
-    /*if (!this.isGameStarted) this.start()
-    return*/
-
     const timer = timers.get('startTimer')
-    switch (timer?.count) {
+    switch (timer.count) {
       case 1:
-        this.sign?.setText('Score at least', 10)
+        this.sign.setText('Score at least', 10)
         break
       case 2:
-        this.sign?.setText(`${this.GOAL_TARGET} goals`)
+        this.sign.setText(`${this.GOAL_TARGET} goals`)
         break
       case 3:
-        this.sign?.setText('in 1 minute')
+        this.sign.setText('in 1 minute')
         break
       case 4:
-        this.sign?.setText('GOOOO!!!')
+        this.sign.setText('GOOOO!!!')
         timers.remove('startTimer')
         this.start()
         break
@@ -187,11 +179,11 @@ export class Game {
       utils.ALL_LAYERS,
       [{ type: 'box', scale: Vector3.create(3, 4, 5) }],
       (entity: Entity) => {
-        const puck = pool.getBy(entity) as Puck
+        const puck = this.pool.getBy(entity) as Puck
         if (puck.isFired && this.time > 0) {
           puck.setFired(false)
-          this.goalSound?.play()
-          this.scene?.playGoalAnimation()
+          this.goalSound.play()
+          this.scene.playGoalAnimation()
           this.update(++this.score, this.time)
         }
       },
@@ -203,6 +195,7 @@ export class Game {
   private setupSounds(): void {
     this.startSound = new Sound(resources.SOUND_START)
     this.hornSound = new Sound(resources.SOUND_HORN)
+    this.slapSound = new Sound(resources.SOUND_SLAP)
     this.goalSound = new Sound(resources.SOUND_GOAL)
     this.whistleSound = new Sound(resources.SOUND_WHISTLE)
     this.gameSound = new Sound(resources.SOUND_GAME, true)
@@ -218,12 +211,12 @@ export class Game {
     const pointerDown = inputSystem.getInputCommand(InputAction.IA_POINTER, PointerEventType.PET_DOWN)
 
     if (pointerDown && this.isGameStarted && !this.isRecalling) {
-      const puck = pool.get()
-      const { /*isStarted, isFired,*/ body, entity } = puck
+      const puck = this.pool.get()
+      const { /*isStarted, isFired,*/ body } = puck
       // if (!isStarted) return
 
       // if (!isFired) {
-      utils.playSound(resources.SOUND_SLAP)
+      this.slapSound.play()
 
       puck.setFired(true)
       // Transform.getMutable(entity).parent = engine.RootEntity
@@ -302,12 +295,11 @@ export class Game {
 
   private updateSystem(dt: number): void {
     if (this.isGameStarted) {
+      this.goalkeeper.update()
+      this.farTender.update()
+      this.nearTender.update()
+      this.pool.update()
       physWorld.update(dt)
-      this.goalkeeper?.update()
-      this.farTender?.update()
-      this.nearTender?.update()
-      // this.puck?.update()
-      pool.update()
     }
   }
 
@@ -319,22 +311,22 @@ export class Game {
     }
 
     if (time < 45) {
-      this.farTender?.start()
+      this.farTender.start()
     }
     if (time < 30) {
-      this.nearTender?.start()
+      this.nearTender.start()
     }
 
-    this.sign?.setScoreTime(time, score, this.GOAL_TARGET)
+    this.sign.setScoreTime(time, score, this.GOAL_TARGET)
   }
 
   private start() {
     this.score = 0
     this.time = 60
-    this.hornSound?.play()
+    this.hornSound.play()
     timers.create('updateTimer', () => this.update(this.score, --this.time), { delay: 1000 })
-    this.goalkeeper?.start()
-    // this.puck?.start()
+    this.goalkeeper.start()
+    // this.puck.start()
     this.puckParent && (Transform.getMutable(this.puckParent).scale = Vector3.One())
     this.isGameStarted = true
   }
@@ -345,22 +337,21 @@ export class Game {
     timers.remove('recallTimer')
 
     if (this.isGameStarted) {
-      this.whistleSound?.play()
+      this.whistleSound.play()
     }
-    this.startSound?.stop()
-    this.gameSound?.stop()
+    this.startSound.stop()
+    this.gameSound.stop()
 
-    this.goalkeeper?.stop()
-    this.farTender?.stop()
-    this.nearTender?.stop()
-    this.sign?.setText(text)
+    this.goalkeeper.stop()
+    this.farTender.stop()
+    this.nearTender.stop()
+    this.sign.setText(text)
     this.score = 0
     this.time = 0
     this.isGameStarted = false
-    pool.clear()
+    this.pool.clear()
 
     this.resetDisc()
-    this.scene?.playIceMachineAnimation()
   }
 
   private resetDisc(): void {
