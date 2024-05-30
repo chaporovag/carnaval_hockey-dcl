@@ -34,10 +34,7 @@ With fun, intuitive gameplay and an engaging neon fairground theme, Neon Hockey 
     <strong>Game fast look</strong>
 </p>
 <br />
-<p align="center">
-    <img src="screenshots/dcl-edit.gif" width="600"><br>
-    <strong>Level builder using DCL Editor</strong>
-</p>
+
 
 ## 🎮 Try it out
 **Requirements**
