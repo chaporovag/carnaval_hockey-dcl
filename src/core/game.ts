@@ -276,22 +276,21 @@ export class Game {
 
     if (this.isGameStarted) {
       this.whistleSound.play();
-      this.scene.playIceMachineAnimation();
-
-      this.startSound.stop();
-      this.gameSound.stop();
-
-      this.goalkeeper.stop();
-      this.farTender.stop();
-      this.nearTender.stop();
-      this.sign.setText(text);
-      this.score = 0;
-      this.time = 0;
-      this.isGameStarted = false;
-      this.pool.clear();
-
-      Transform.getMutable(this.puckParent).scale = Vector3.Zero();
-      this.isRecalling = false;
     }
+
+    this.startSound.stop();
+    this.gameSound.stop();
+
+    this.goalkeeper.stop();
+    this.farTender.stop();
+    this.nearTender.stop();
+    this.sign.setText(text);
+    this.score = 0;
+    this.time = 0;
+    this.isGameStarted = false;
+    this.pool.clear();
+    this.scene.playIceMachineAnimation();
+    Transform.getMutable(this.puckParent).scale = Vector3.Zero();
+    this.isRecalling = false;
   }
 }
