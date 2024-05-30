@@ -33,10 +33,7 @@ export class Goalkeeper {
 
   private createEntity(position: Vector3): Entity {
     const entity = engine.addEntity();
-    Transform.create(entity, {
-      position,
-      scale: Vector3.scale(Vector3.One(), 0.5)
-    });
+    Transform.create(entity, { position });
     return entity;
   }
 
