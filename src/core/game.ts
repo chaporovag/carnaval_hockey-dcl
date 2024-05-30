@@ -1,6 +1,4 @@
 import {
-  AvatarModifierArea,
-  AvatarModifierType,
   CameraModeArea,
   CameraType,
   engine,
@@ -8,7 +6,6 @@ import {
   GltfContainer,
   InputAction,
   inputSystem,
-  PlayerIdentityData,
   PointerEventType,
   Transform
 } from '@dcl/sdk/ecs';
@@ -124,23 +121,10 @@ export class Game {
         this.startSound.play();
         this.gameSound.play();
         timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 });
-
-        const excludeIds = [];
-        for (const [entity, data, transform] of engine.getEntitiesWith(PlayerIdentityData, Transform)) {
-          console.log('Player data: ', { entity, data, transform });
-          excludeIds.push(data.address);
-        }
-        AvatarModifierArea.getMutable(thirdViewArea).excludeIds = excludeIds;
       },
       () => this.end(),
       Color3.Yellow()
     );
-
-    AvatarModifierArea.create(thirdViewArea, {
-      area: thirdViewAreaSize,
-      modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
-      excludeIds: []
-    });
 
     CameraModeArea.create(thirdViewArea, {
       area: thirdViewAreaSize,
