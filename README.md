@@ -65,10 +65,11 @@ npm start
 
 
 ## 🙏 Backlog
-** Lorem ipsum Lorem ipsum**
 
-Lorem ipsum Lorem ipsum
-
+- Leaderboard
+- Multiplayer mode for 4 players
+- Reward system
+- Referral system "Invite a friend" and create your team
 
 
 
