@@ -45,7 +45,8 @@ export class Scene {
         {
           clip: 'on',
           playing: true,
-          loop: true
+          loop: true,
+          speed: 2
         }
       ]
     });
@@ -208,21 +209,23 @@ export class Scene {
   }
 
   public playIceMachineAnimation(): void {
-    timers.create(
-      'iceMachine',
-      () => {
-        this.isIceMachineAnimationPlaying = true;
-        Animator.playSingleAnimation(this.iceMachine, 'on');
-        tweens.startTranslation(
-          this.iceMachineParent,
-          Vector3.create(this.SCENE_POSITION.x, this.SCENE_POSITION.y + 2.3, this.SCENE_POSITION.z),
-          this.SCENE_POSITION,
-          0.5
-        );
-        tweens.startScaling(this.iceMachine, Vector3.Zero(), Vector3.One(), 0.5);
-      },
-      { delay: 5000, maxCount: 1 }
-    );
+    if (!this.isIceMachineAnimationPlaying) {
+      timers.create(
+        'iceMachine',
+        () => {
+          this.isIceMachineAnimationPlaying = true;
+          Animator.playSingleAnimation(this.iceMachine, 'on');
+          tweens.startTranslation(
+            this.iceMachineParent,
+            Vector3.create(this.SCENE_POSITION.x, this.SCENE_POSITION.y + 2.3, this.SCENE_POSITION.z),
+            this.SCENE_POSITION,
+            0.5
+          );
+          tweens.startScaling(this.iceMachine, Vector3.Zero(), Vector3.One(), 0.5);
+        },
+        { delay: 5000, maxCount: 1 }
+      );
+    }
   }
 
   public stopIceMachineAnimation(): void {
