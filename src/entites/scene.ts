@@ -2,16 +2,20 @@ import { Animator, engine, Entity, GltfContainer, Transform } from '@dcl/sdk/ecs
 import { Color4, Vector3 } from '@dcl/sdk/math';
 import { PhysFactory } from '../core/physFactory';
 import { Materials, physWorld } from '../core/physWorld';
-import { addTestCube } from '@dcl-sdk/utils';
+import { addTestCube, tweens } from '@dcl-sdk/utils';
 import CANNON from 'cannon/build/cannon';
 import resources from '../core/resources';
+import { timers } from '../core/timers';
 
 export class Scene {
   private readonly SCENE_POSITION = Vector3.create(32, 0, 32);
 
   private readonly entity: Entity = engine.addEntity();
+  private readonly iceMachine: Entity = engine.addEntity();
+  private readonly iceMachineParent: Entity = engine.addEntity();
   private readonly goalAnimation: Entity = engine.addEntity();
   private readonly tutorialAnimation: Entity = engine.addEntity();
+  private isIceMachineAnimationPlaying: boolean = true;
 
   constructor(debug: boolean = false) {
     const world = physWorld.getWorld();
@@ -26,6 +30,24 @@ export class Scene {
     GltfContainer.create(this.entity, { src: resources.MODEL_SCENE });
     Transform.create(this.entity, {
       position: this.SCENE_POSITION
+    });
+
+    Transform.create(this.iceMachineParent, {
+      position: this.SCENE_POSITION
+    });
+    GltfContainer.create(this.iceMachine, { src: resources.MODEL_ICE_MACHINE });
+    Transform.create(this.iceMachine, {
+      parent: this.iceMachineParent
+    });
+
+    Animator.create(this.iceMachine, {
+      states: [
+        {
+          clip: 'on',
+          playing: true,
+          loop: true
+        }
+      ]
     });
 
     GltfContainer.create(this.goalAnimation, { src: resources.MODEL_GOAL_FX });
@@ -183,5 +205,38 @@ export class Scene {
 
   public playTutorialAnimation(): void {
     Animator.playSingleAnimation(this.tutorialAnimation, 'on');
+  }
+
+  public playIceMachineAnimation(): void {
+    timers.create(
+      'iceMachine',
+      () => {
+        this.isIceMachineAnimationPlaying = true;
+        Animator.playSingleAnimation(this.iceMachine, 'on');
+        tweens.startTranslation(
+          this.iceMachineParent,
+          Vector3.create(this.SCENE_POSITION.x, this.SCENE_POSITION.y + 2.3, this.SCENE_POSITION.z),
+          this.SCENE_POSITION,
+          0.5
+        );
+        tweens.startScaling(this.iceMachine, Vector3.Zero(), Vector3.One(), 0.5);
+      },
+      { delay: 5000, maxCount: 1 }
+    );
+  }
+
+  public stopIceMachineAnimation(): void {
+    timers.remove('iceMachine');
+    if (this.isIceMachineAnimationPlaying) {
+      this.isIceMachineAnimationPlaying = false;
+      Animator.stopAllAnimations(this.iceMachine);
+      tweens.startTranslation(
+        this.iceMachineParent,
+        this.SCENE_POSITION,
+        Vector3.create(this.SCENE_POSITION.x, this.SCENE_POSITION.y + 2.3, this.SCENE_POSITION.z),
+        0.5
+      );
+      tweens.startScaling(this.iceMachine, Vector3.One(), Vector3.Zero(), 0.5);
+    }
   }
 }

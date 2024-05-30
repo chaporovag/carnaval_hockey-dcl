@@ -5,6 +5,7 @@ import { Materials, physWorld } from '../core/physWorld';
 import { addTestCube, tweens } from '@dcl-sdk/utils';
 import { InterpolationType } from '@dcl/asset-packs';
 import resources from '../core/resources';
+import { timers } from '../core/timers';
 
 interface IPosition {
   left: Vector3;
@@ -17,6 +18,7 @@ export class Goaltender {
   private readonly debugEntity!: Entity;
   private readonly body: CANNON.Body;
 
+  private isStarted = false;
   private isReadyToPlay = false;
   private interpolationType = InterpolationType.EASEOUTEBOUNCE;
 
@@ -84,7 +86,8 @@ export class Goaltender {
   }
 
   public start(): void {
-    if (!this.isReadyToPlay) {
+    if (!this.isStarted && !this.isReadyToPlay) {
+      this.isStarted = true;
       const position = Transform.get(this.entity).position;
       this.body.position.set(position.x, position.y, position.z);
       Transform.getMutable(this.player).scale = Vector3.One();
@@ -103,7 +106,9 @@ export class Goaltender {
   }
 
   public stop(): void {
+    this.isStarted = false;
     this.isReadyToPlay = false;
+    timers.remove('goalkeeper');
     tweens.stopTranslation(this.entity);
     tweens.startRotation(
       this.player,

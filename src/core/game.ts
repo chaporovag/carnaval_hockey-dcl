@@ -118,6 +118,7 @@ export class Game {
       [{ type: 'box', scale: thirdViewAreaSize }],
       () => {
         this.scene.playTutorialAnimation();
+        this.scene.stopIceMachineAnimation();
         this.startSound.play();
         this.gameSound.play();
         timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 });
@@ -247,10 +248,11 @@ export class Game {
       return;
     }
 
-    if (time < 45) {
+    if (time === 45 || score === 10) {
       this.farTender.start();
     }
-    if (time < 30) {
+
+    if (time === 30 || score === 15) {
       this.nearTender.start();
     }
 
@@ -274,20 +276,22 @@ export class Game {
 
     if (this.isGameStarted) {
       this.whistleSound.play();
+      this.scene.playIceMachineAnimation();
+
+      this.startSound.stop();
+      this.gameSound.stop();
+
+      this.goalkeeper.stop();
+      this.farTender.stop();
+      this.nearTender.stop();
+      this.sign.setText(text);
+      this.score = 0;
+      this.time = 0;
+      this.isGameStarted = false;
+      this.pool.clear();
+
+      Transform.getMutable(this.puckParent).scale = Vector3.Zero();
+      this.isRecalling = false;
     }
-    this.startSound.stop();
-    this.gameSound.stop();
-
-    this.goalkeeper.stop();
-    this.farTender.stop();
-    this.nearTender.stop();
-    this.sign.setText(text);
-    this.score = 0;
-    this.time = 0;
-    this.isGameStarted = false;
-    this.pool.clear();
-
-    Transform.getMutable(this.puckParent).scale = Vector3.Zero();
-    this.isRecalling = false;
   }
 }
