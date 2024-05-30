@@ -49,10 +49,6 @@ export class Puck {
     mutable.scale = Vector3.One();
   }
 
-  public stop(): void {
-    this._isActive = false;
-  }
-
   public update(): void {
     let transform = Transform.getMutable(this._entity);
     transform.position = this._body.position;

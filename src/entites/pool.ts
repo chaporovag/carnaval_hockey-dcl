@@ -11,24 +11,24 @@ export class Pool {
     scale: Vector3.One()
   };
 
-  private readonly _poolList: Puck[] = [];
-  private readonly _allList: Puck[] = [];
-  private _activeList: Puck[] = [];
+  private readonly poolList: Puck[] = [];
+  private readonly allList: Puck[] = [];
+  private activeList: Puck[] = [];
 
   public get(): Puck {
     let puck: Puck;
 
-    if (this._poolList.length > 0) {
-      puck = this._poolList.pop() as Puck;
+    if (this.poolList.length > 0) {
+      puck = this.poolList.pop() as Puck;
       const { body, entity } = puck;
       body.velocity.setZero();
       body.angularVelocity.setZero();
       let transform = Transform.getMutable(entity);
       transform.position = this.TRANSFORM.position;
       transform.scale = this.TRANSFORM.scale;
-    } else if (this._activeList.length < this.POOL_SIZE) {
+    } else if (this.activeList.length < this.POOL_SIZE) {
       puck = new Puck(this.TRANSFORM);
-      this._allList.push(puck);
+      this.allList.push(puck);
     } else {
       throw new Error('Maximum number of packs reached');
     }
@@ -39,22 +39,22 @@ export class Pool {
   }
 
   private activate(puck: Puck) {
-    this._activeList.push(puck);
+    this.activeList.push(puck);
     timers.setTimeout(() => this.deactivate(puck), 5000);
   }
 
   private deactivate(puck: Puck) {
-    this._activeList = this._activeList.filter((activeObject) => activeObject !== puck);
+    this.activeList = this.activeList.filter((activeObject) => activeObject !== puck);
     puck.setActive(false);
-    this._poolList.push(puck);
+    this.poolList.push(puck);
   }
 
   public update(): void {
-    this._activeList.forEach((activeObject) => activeObject.update());
+    this.activeList.forEach((activeObject) => activeObject.update());
   }
 
   public clear(): void {
-    this._allList.forEach((puck) => {
+    this.allList.forEach((puck) => {
       let transform = Transform.getMutable(puck.entity);
       transform.scale = Vector3.Zero();
       puck.setActive(false);
@@ -62,6 +62,6 @@ export class Pool {
   }
 
   public getBy(entity: Entity): Puck | undefined {
-    return this._allList.find((puck) => puck.entity === entity);
+    return this.allList.find((puck) => puck.entity === entity);
   }
 }
