@@ -53,7 +53,7 @@ export class Game {
 
   constructor(debug: boolean = false) {
     this.isDebug = debug;
-    triggers.enableDebugDraw(false);
+    triggers.enableDebugDraw(this.isDebug);
     physWorld.setDebugDraw(this.isDebug);
   }
 
