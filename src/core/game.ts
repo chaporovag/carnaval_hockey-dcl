@@ -1,4 +1,6 @@
 import {
+  AvatarModifierArea,
+  AvatarModifierType,
   CameraModeArea,
   CameraType,
   engine,
@@ -16,7 +18,6 @@ import { physWorld } from './physWorld';
 import resources from './resources';
 import { Goalkeeper, Goaltender, Pool, Puck, Scene, Scoreboard } from '../entites';
 import { Sound } from './sound';
-import { setupUi } from '../ui/ui';
 import { timers } from './timers';
 
 export class Game {
@@ -42,6 +43,7 @@ export class Game {
   private nearTender!: Goaltender;
 
   // Sounds
+  private ambientSound!: Sound;
   private startSound!: Sound;
   private hornSound!: Sound;
   private slapSound!: Sound;
@@ -51,12 +53,11 @@ export class Game {
 
   constructor(debug: boolean = false) {
     this.isDebug = debug;
-    triggers.enableDebugDraw(this.isDebug);
+    triggers.enableDebugDraw(false);
     physWorld.setDebugDraw(this.isDebug);
   }
 
-  public init() {
-    setupUi();
+  public run() {
     this.setupGameObjects();
     this.setupTriggers();
     this.setupSounds();
@@ -117,19 +118,25 @@ export class Game {
       LAYER_1,
       [{ type: 'box', scale: thirdViewAreaSize }],
       () => {
-        this.scene.playTutorialAnimation();
-        this.scene.stopIceMachineAnimation();
-        this.startSound.play();
-        this.gameSound.play();
-        timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 });
+        this.init();
+        this.ambientSound.stop();
       },
-      () => this.end(),
+      () => {
+        this.end();
+        this.ambientSound.play();
+      },
       Color3.Yellow()
     );
 
     CameraModeArea.create(thirdViewArea, {
       area: thirdViewAreaSize,
       mode: CameraType.CT_FIRST_PERSON
+    });
+
+    AvatarModifierArea.create(thirdViewArea, {
+      area: thirdViewAreaSize,
+      modifiers: [AvatarModifierType.AMT_DISABLE_PASSPORTS],
+      excludeIds: []
     });
   }
 
@@ -182,6 +189,8 @@ export class Game {
     this.goalSound = new Sound(resources.SOUND_GOAL);
     this.whistleSound = new Sound(resources.SOUND_WHISTLE);
     this.gameSound = new Sound(resources.SOUND_GAME, true);
+    this.ambientSound = new Sound(resources.SOUND_AMBIENT, true);
+    this.ambientSound.play();
   }
 
   private setupSystems(): void {
@@ -257,6 +266,14 @@ export class Game {
     }
 
     this.sign.setScoreTime(time, score, this.GOAL_TARGET);
+  }
+
+  private init() {
+    this.scene.playTutorialAnimation();
+    this.scene.stopIceMachineAnimation();
+    this.startSound.play();
+    this.gameSound.play();
+    timers.create('startTimer', () => this.updateStartTimer(), { delay: 3100, immediately: true, maxCount: 4 });
   }
 
   private start() {
