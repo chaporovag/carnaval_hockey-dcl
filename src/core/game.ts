@@ -43,7 +43,6 @@ export class Game {
   private nearTender!: Goaltender;
 
   // Sounds
-  private ambientSound!: Sound;
   private startSound!: Sound;
   private hornSound!: Sound;
   private slapSound!: Sound;
@@ -117,14 +116,8 @@ export class Game {
       NO_LAYERS,
       LAYER_1,
       [{ type: 'box', scale: thirdViewAreaSize }],
-      () => {
-        this.init();
-        this.ambientSound.stop();
-      },
-      () => {
-        this.end();
-        this.ambientSound.play();
-      },
+      () => this.init(),
+      () => this.end(),
       Color3.Yellow()
     );
 
@@ -189,8 +182,6 @@ export class Game {
     this.goalSound = new Sound(resources.SOUND_GOAL);
     this.whistleSound = new Sound(resources.SOUND_WHISTLE);
     this.gameSound = new Sound(resources.SOUND_GAME, true);
-    this.ambientSound = new Sound(resources.SOUND_AMBIENT, true);
-    this.ambientSound.play();
   }
 
   private setupSystems(): void {

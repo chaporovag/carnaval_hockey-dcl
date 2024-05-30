@@ -7,7 +7,6 @@ export default {
   MODEL_GOALKEEPER: 'models/goalKeeper.glb',
   MODEL_GOALTENDER: 'models/goalTender.glb',
 
-  SOUND_AMBIENT: 'sounds/ambient.mp3',
   SOUND_GAME: 'sounds/game_session.mp3',
   SOUND_HORN: 'sounds/horn.mp3',
   SOUND_GOAL: 'sounds/horn_goal.mp3',
