@@ -1,7 +1,7 @@
 <br />
 <p align="center">
 <a >
-    <img src="images/scene-thumbnail.png" alt="Logo">
+    <img src="[https://img.itch.zone/aW1hZ2UyL2phbS8zODc3MDEvMTU4OTQwODQucG5n/original/PGxc14.png]" alt="Logo">
 </a>
 
 <h3 align="center">Neon Hockey Attraction Simulator for Decentraland Game Jam 2024<br /><br />[ by Inception Team ]</h3>
