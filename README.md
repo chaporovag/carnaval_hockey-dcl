@@ -32,6 +32,10 @@ With fun, intuitive gameplay and an engaging neon fairground theme, Neon Hockey 
 <p align="center">
     <img src="screenshots/preview.gif" width="600"><br>
     <strong>Game fast look</strong>
+
+![Screenshot](https://i.ibb.co/RjDfKFL/enshot1.png)
+![Screenshot](https://i.ibb.co/xFrv3gR/image-2024-05-30-23-49-13.png)
+
 </p>
 <br />
 
@@ -73,7 +77,7 @@ npm start
 ## 🚩 More info
 
 - Scene playground on Decentraland : https://decentraland.org/play/?realm=0xmaki.dcl.eth
-- Game walkthrough: https://www.youtube.com/watch
+- Game walkthrough: https://youtu.be/0eZSDdweYsE
 - About Decentraland’s 2024 Game Jam: https://decentraland.org/blog/announcements/announcing-decentraland-game-expo-register-for-the-game-jam-and-call-for
 
 
