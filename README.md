@@ -28,9 +28,11 @@ You have to control the puck by clicking the mouse to hit it and aim for the goa
 The game is optimized to run smoothly at 30 FPS, ensuring a seamless and enjoyable experience. Both graphics and mechanics are fine-tuned to prevent lags and delays. Combining arcade ice hockey with a neon visual style, Neon Hockey Arcade offers a unique and engaging experience. Utilizing the capabilities of Decentraland, the game creates an immersive and visually stunning environment.
 
 With fun, intuitive gameplay and an engaging neon fairground theme, Neon Hockey Arcade is the perfect addition to Neon Fairground.
-
+ 
+ 
+## Game fast look
 <p align="center">
-    <strong>Game fast look</strong>
+   
     <img src="https://i.ibb.co/LSmBhyJ/Hockey.gif" width="600"><br>
 
 ![Screenshot](https://i.ibb.co/RjDfKFL/enshot1.png)
