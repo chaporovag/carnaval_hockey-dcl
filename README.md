@@ -30,7 +30,7 @@ The game is optimized to run smoothly at 30 FPS, ensuring a seamless and enjoyab
 With fun, intuitive gameplay and an engaging neon fairground theme, Neon Hockey Arcade is the perfect addition to Neon Fairground.
 
 <p align="center">
-    <img src="screenshots/preview.gif" width="600"><br>
+    <img src="https://i.ibb.co/LSmBhyJ/Hockey.gif" width="600"><br>
     <strong>Game fast look</strong>
 
 ![Screenshot](https://i.ibb.co/RjDfKFL/enshot1.png)
