@@ -33,8 +33,7 @@ With fun, intuitive gameplay and an engaging neon fairground theme, Neon Hockey 
 ## Game fast look
 <p align="center">
    
-<img src="https://i.ibb.co/xCNWgQq/Project-1.gif" width="840"><br>
-
+![Project GIF](https://i.ibb.co/xCNWgQq/Project-1.gif)
 ![Screenshot](https://i.ibb.co/RjDfKFL/enshot1.png)
 
 ![Screenshot](https://i.ibb.co/xFrv3gR/image-2024-05-30-23-49-13.png)
